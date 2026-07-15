@@ -12,10 +12,12 @@ export function Card({
   className?: string;
 }) {
   return (
-    <div className={`min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+    <div
+      className={`min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-border-default dark:bg-surface ${className}`}
+    >
       {title ? (
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="font-semibold text-stf-navy">{title}</h2>
+          <h2 className="font-semibold text-stf-navy dark:text-white">{title}</h2>
           {action}
         </div>
       ) : null}

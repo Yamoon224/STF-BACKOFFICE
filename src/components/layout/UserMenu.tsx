@@ -50,18 +50,18 @@ export function UserMenu({
       {open ? (
         <div
           role="menu"
-          className={`absolute z-40 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg ${panelClassName}`}
+          className={`absolute z-40 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg dark:border-border-default dark:bg-surface ${panelClassName}`}
         >
-          <div className="border-b border-slate-100 px-3 py-2">
-            <p className="truncate text-sm font-semibold text-stf-navy">{currentUser.name}</p>
-            <p className="truncate text-xs text-slate-500">{currentUser.email}</p>
+          <div className="border-b border-slate-100 px-3 py-2 dark:border-border-subtle">
+            <p className="truncate text-sm font-semibold text-stf-navy dark:text-white">{currentUser.name}</p>
+            <p className="truncate text-xs text-slate-500 dark:text-slate-400">{currentUser.email}</p>
           </div>
           <div className="mt-1 flex flex-col gap-0.5">
             <Link
               href="/profil"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
               <span className="text-base">👤</span>
               Mon profil
@@ -70,7 +70,7 @@ export function UserMenu({
               href="/parametres"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
               <span className="text-base">⚙️</span>
               Paramètres
@@ -79,7 +79,7 @@ export function UserMenu({
               href="/connexion"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-stf-red hover:bg-stf-red-light"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-stf-red hover:bg-stf-red-light dark:hover:bg-stf-red/15"
             >
               <span className="text-base">🚪</span>
               Se déconnecter
