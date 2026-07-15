@@ -7,56 +7,64 @@ import { useState, type ReactNode } from "react";
 import { currentUser } from "@/lib/mock-data";
 import { UserMenu } from "./UserMenu";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import type { TranslateFn } from "@/lib/i18n/LanguageProvider";
 
-const navGroups: { title: string; items: { href: string; label: string; icon: string }[] }[] = [
+const navGroups: { titleKey: string; items: { href: string; labelKey: string; icon: string }[] }[] = [
   {
-    title: "Vue d'ensemble",
-    items: [{ href: "/", label: "Tableau de bord", icon: "📊" }],
+    titleKey: "overview",
+    items: [{ href: "/", labelKey: "dashboard", icon: "📊" }],
   },
   {
-    title: "Mentorat",
+    titleKey: "mentorat",
     items: [
-      { href: "/utilisatrices", label: "Utilisatrices", icon: "👤" },
-      { href: "/programmes", label: "Programmes & cohortes", icon: "🎯" },
-      { href: "/matching", label: "Matching", icon: "🔗" },
-      { href: "/binomes", label: "Binômes & sessions", icon: "🤝" },
-      { href: "/groupes", label: "Groupes", icon: "👥" },
+      { href: "/utilisatrices", labelKey: "utilisatrices", icon: "👤" },
+      { href: "/programmes", labelKey: "programmes", icon: "🎯" },
+      { href: "/matching", labelKey: "matching", icon: "🔗" },
+      { href: "/binomes", labelKey: "binomes", icon: "🤝" },
+      { href: "/groupes", labelKey: "groupes", icon: "👥" },
     ],
   },
   {
-    title: "Contenu & données",
+    titleKey: "contenu",
     items: [
-      { href: "/cms", label: "CMS", icon: "📝" },
-      { href: "/reporting", label: "Reporting & exports", icon: "📈" },
+      { href: "/cms", labelKey: "cms", icon: "📝" },
+      { href: "/reporting", labelKey: "reporting", icon: "📈" },
     ],
   },
   {
-    title: "Sécurité",
+    titleKey: "securite",
     items: [
-      { href: "/signalements", label: "Signalements", icon: "🚩" },
-      { href: "/audit-logs", label: "Journaux d'audit", icon: "🛡️" },
-      { href: "/parametres", label: "Paramètres", icon: "⚙️" },
+      { href: "/signalements", labelKey: "signalements", icon: "🚩" },
+      { href: "/audit-logs", labelKey: "auditLogs", icon: "🛡️" },
+      { href: "/parametres", labelKey: "parametres", icon: "⚙️" },
     ],
   },
 ];
 
 const allItems = navGroups.flatMap((g) => g.items);
 
-function pageTitle(pathname: string) {
-  if (pathname === "/profil") return "Mon profil";
-  return allItems.find((i) => i.href === pathname)?.label ?? "Tableau de bord";
+function pageTitleKey(pathname: string) {
+  if (pathname === "/profil") return "profil";
+  return allItems.find((i) => i.href === pathname)?.labelKey ?? "dashboard";
 }
 
-export function AdminShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-
-  const NavList = ({ onNavigate }: { onNavigate?: () => void }) => (
+function NavList({
+  pathname,
+  t,
+  onNavigate,
+}: {
+  pathname: string;
+  t: TranslateFn;
+  onNavigate?: () => void;
+}) {
+  return (
     <nav className="flex flex-1 flex-col gap-6 px-3">
       {navGroups.map((group) => (
-        <div key={group.title}>
+        <div key={group.titleKey}>
           <p className="px-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            {group.title}
+            {t(`nav.${group.titleKey}`)}
           </p>
           <div className="mt-2 flex flex-col gap-1">
             {group.items.map((item) => {
@@ -73,7 +81,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   }`}
                 >
                   <span className="text-base">{item.icon}</span>
-                  {item.label}
+                  {t(`nav.${item.labelKey}`)}
                 </Link>
               );
             })}
@@ -82,6 +90,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
       ))}
     </nav>
   );
+}
+
+export function AdminShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div className="flex min-h-screen">
@@ -90,9 +104,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <span className="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-black/5">
             <Image src="/brand/logo.jpg" alt="STF" fill sizes="36px" className="object-cover" />
           </span>
-          <span className="text-sm font-semibold text-stf-navy dark:text-white">Back-office</span>
+          <span className="text-sm font-semibold text-stf-navy dark:text-white">{t("nav.backoffice")}</span>
         </Link>
-        <NavList />
+        <NavList pathname={pathname} t={t} />
         <div className="mx-3 mt-6">
           <UserMenu
             panelClassName="bottom-full left-0 mb-2"
@@ -113,15 +127,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       {open ? (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <button aria-label="Fermer le menu" className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
+          <button aria-label={t("nav.fermerMenu")} className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
           <aside className="absolute left-0 top-0 flex h-full w-72 flex-col overflow-y-auto bg-white py-6 shadow-xl dark:bg-surface">
             <div className="flex items-center justify-between px-6 pb-6">
-              <span className="text-sm font-semibold text-stf-navy dark:text-white">Back-office STF</span>
-              <button onClick={() => setOpen(false)} aria-label="Fermer" className="text-xl text-slate-500 dark:text-slate-300">
+              <span className="text-sm font-semibold text-stf-navy dark:text-white">{t("nav.backofficeStf")}</span>
+              <button onClick={() => setOpen(false)} aria-label={t("nav.fermer")} className="text-xl text-slate-500 dark:text-slate-300">
                 ✕
               </button>
             </div>
-            <NavList onNavigate={() => setOpen(false)} />
+            <NavList pathname={pathname} t={t} onNavigate={() => setOpen(false)} />
           </aside>
         </div>
       ) : null}
@@ -131,22 +145,23 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setOpen(true)}
-              aria-label="Ouvrir le menu"
+              aria-label={t("nav.ouvrirMenu")}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 dark:border-border-default lg:hidden"
             >
               ☰
             </button>
-            <h1 className="truncate text-lg font-semibold text-stf-navy dark:text-white">{pageTitle(pathname)}</h1>
+            <h1 className="truncate text-lg font-semibold text-stf-navy dark:text-white">{t(`nav.${pageTitleKey(pathname)}`)}</h1>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             <input
               type="search"
-              placeholder="Rechercher…"
+              placeholder={t("topbar.rechercher")}
               className="hidden w-56 rounded-full border border-slate-200 px-4 py-2 text-sm outline-none focus:border-stf-blue dark:border-border-default dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 md:block"
             />
+            <LanguageToggle />
             <ThemeToggle />
             <button
-              aria-label="Notifications"
+              aria-label={t("topbar.notifications")}
               className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 dark:border-border-default dark:text-slate-300"
             >
               🔔

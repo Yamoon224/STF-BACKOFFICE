@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { currentUser } from "@/lib/mock-data";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function UserMenu({
   trigger,
@@ -13,6 +14,7 @@ export function UserMenu({
 }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!open) return;
@@ -41,7 +43,7 @@ export function UserMenu({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Menu du profil"
+        aria-label={t("userMenu.menuProfil")}
         className="w-full text-left"
       >
         {trigger}
@@ -64,7 +66,7 @@ export function UserMenu({
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
               <span className="text-base">👤</span>
-              Mon profil
+              {t("userMenu.monProfil")}
             </Link>
             <Link
               href="/parametres"
@@ -73,7 +75,7 @@ export function UserMenu({
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
               <span className="text-base">⚙️</span>
-              Paramètres
+              {t("userMenu.parametres")}
             </Link>
             <Link
               href="/connexion"
@@ -82,7 +84,7 @@ export function UserMenu({
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-stf-red hover:bg-stf-red-light dark:hover:bg-stf-red/15"
             >
               <span className="text-base">🚪</span>
-              Se déconnecter
+              {t("userMenu.deconnexion")}
             </Link>
           </div>
         </div>
