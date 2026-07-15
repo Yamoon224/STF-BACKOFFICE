@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { currentUser } from "@/lib/mock-data";
+import { UserMenu } from "./UserMenu";
 
 const navGroups: { title: string; items: { href: string; label: string; icon: string }[] }[] = [
   {
@@ -40,6 +42,7 @@ const navGroups: { title: string; items: { href: string; label: string; icon: st
 const allItems = navGroups.flatMap((g) => g.items);
 
 function pageTitle(pathname: string) {
+  if (pathname === "/profil") return "Mon profil";
   return allItems.find((i) => i.href === pathname)?.label ?? "Tableau de bord";
 }
 
@@ -89,14 +92,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <span className="text-sm font-semibold text-stf-navy">Back-office</span>
         </Link>
         <NavList />
-        <div className="mx-3 mt-6 flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange">
-            AS
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-stf-navy">Administratrice STF</p>
-            <p className="truncate text-xs text-slate-500">Accès global · MFA activé</p>
-          </div>
+        <div className="mx-3 mt-6">
+          <UserMenu
+            panelClassName="bottom-full left-0 mb-2"
+            trigger={
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 hover:bg-slate-100">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange">
+                  {currentUser.initials}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-stf-navy">{currentUser.name}</p>
+                  <p className="truncate text-xs text-slate-500">{currentUser.access}</p>
+                </div>
+              </div>
+            }
+          />
         </div>
       </aside>
 
@@ -140,9 +150,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
               🔔
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-stf-orange" />
             </button>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange lg:hidden">
-              AS
-            </span>
+            <div className="lg:hidden">
+              <UserMenu
+                panelClassName="right-0 top-full mt-2"
+                trigger={
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange">
+                    {currentUser.initials}
+                  </span>
+                }
+              />
+            </div>
           </div>
         </header>
 

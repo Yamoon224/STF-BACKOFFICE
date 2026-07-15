@@ -1,3 +1,13 @@
+export const currentUser = {
+  name: "Administratrice STF",
+  initials: "AS",
+  role: "Administratrice STF",
+  email: "admin@stf-organisation.org",
+  access: "Accès global · toutes permissions",
+  mfa: true,
+  lastLogin: "2026-07-15 08:32",
+};
+
 export const kpis = [
   { label: "Mentées actives", value: "1 860", trend: "+4.2% ce mois" },
   { label: "Mentores validées", value: "180", trend: "+6 ce mois" },
