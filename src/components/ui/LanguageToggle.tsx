@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { Locale } from "@/lib/i18n/dictionaries";
 
-const options: { value: Locale; label: string; name: string; flag: string }[] = [
-  { value: "fr", label: "FR", name: "Français", flag: "🇫🇷" },
-  { value: "en", label: "US", name: "English", flag: "🇺🇸" },
+const options: { value: Locale; label: string; name: string }[] = [
+  { value: "fr", label: "FR", name: "Français" },
+  { value: "en", label: "US", name: "English" },
 ];
 
 export function LanguageToggle({ className = "" }: { className?: string }) {
@@ -50,9 +50,16 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
             : "border-slate-200 text-slate-600 hover:border-stf-orange hover:text-stf-orange dark:border-border-default dark:text-slate-300"
         }`}
       >
-        <span aria-hidden className="text-sm leading-none">
-          {current.flag}
-        </span>
+        <svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4 fill-none stroke-current"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.4 2.5 3.7 5.6 3.7 9s-1.3 6.5-3.7 9c-2.4-2.5-3.7-5.6-3.7-9S9.6 5.5 12 3Z" />
+        </svg>
         <span>{current.label}</span>
         <svg
           viewBox="0 0 24 24"
@@ -89,7 +96,16 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
                     : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5"
                 }`}
               >
-                <span aria-hidden>{option.flag}</span>
+                <span
+                  aria-hidden
+                  className={`flex h-5 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold ${
+                    selected
+                      ? "bg-stf-orange/15 text-stf-orange"
+                      : "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400"
+                  }`}
+                >
+                  {option.label}
+                </span>
                 {option.name}
                 {selected ? (
                   <svg
