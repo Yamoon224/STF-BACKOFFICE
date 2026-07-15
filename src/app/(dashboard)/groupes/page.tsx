@@ -1,15 +1,43 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { groups } from "@/lib/mock-data";
+import { Modal } from "@/components/ui/Modal";
+import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { groups as initialGroups } from "@/lib/mock-data";
+
+const groupTypes = ["Automatique", "Travail", "Mentorat"];
 
 export default function GroupesPage() {
+  const [groups, setGroups] = useState(initialGroups);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [type, setType] = useState(groupTypes[1]);
+  const [members, setMembers] = useState("0");
+
+  function handleCreate(event: FormEvent) {
+    event.preventDefault();
+    setGroups((prev) => [
+      { name: name.trim(), type, members: Number(members) || 0, status: "En validation" },
+      ...prev,
+    ]);
+    setName("");
+    setType(groupTypes[1]);
+    setMembers("0");
+    setOpen(false);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <p className="text-sm text-slate-500 dark:text-slate-400">
           Groupes automatiques, de travail et de mentorat collectif. Fermés par défaut, soumis à validation STF.
         </p>
-        <button className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90">
+        <button
+          onClick={() => setOpen(true)}
+          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+        >
           + Créer un groupe
         </button>
       </div>
@@ -46,6 +74,58 @@ export default function GroupesPage() {
           </table>
         </div>
       </Card>
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Créer un groupe"
+        description="Le groupe sera créé fermé, en attente de validation STF."
+      >
+        <form onSubmit={handleCreate} className="space-y-5">
+          <Field label="Nom du groupe">
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ex. Atelier Robotique — Projet pilote"
+              className={fieldInputClass}
+            />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Type">
+              <select value={type} onChange={(e) => setType(e.target.value)} className={fieldInputClass}>
+                {groupTypes.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Membres initiaux">
+              <input
+                type="number"
+                min={0}
+                value={members}
+                onChange={(e) => setMembers(e.target.value)}
+                className={fieldInputClass}
+              />
+            </Field>
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+            >
+              Créer le groupe
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

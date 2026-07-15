@@ -1,6 +1,11 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { users } from "@/lib/mock-data";
+import { Modal } from "@/components/ui/Modal";
+import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { users as initialUsers } from "@/lib/mock-data";
 
 const statusTone = {
   Active: "green",
@@ -12,13 +17,42 @@ const statusTone = {
 const roleFilters = ["Toutes", "Mentées", "Mentores", "Collaboratrices STF", "Bailleurs"];
 
 export default function UtilisatricesPage() {
+  const [users, setUsers] = useState(initialUsers);
+  const [open, setOpen] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [program, setProgram] = useState("");
+
+  function handleInvite(event: FormEvent) {
+    event.preventDefault();
+    setUsers((prev) => [
+      {
+        name: `${firstName} ${lastName}`.trim(),
+        role: "Collaboratrice STF",
+        status: "En attente",
+        program: program.trim() || "—",
+        country: "—",
+      },
+      ...prev,
+    ]);
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setProgram("");
+    setOpen(false);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <p className="text-sm text-slate-500 dark:text-slate-400">
           Gestion des comptes, validation des mentores, rôles et permissions.
         </p>
-        <button className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90">
+        <button
+          onClick={() => setOpen(true)}
+          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+        >
           + Inviter une collaboratrice
         </button>
       </div>
@@ -85,6 +119,67 @@ export default function UtilisatricesPage() {
           </table>
         </div>
       </Card>
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Inviter une collaboratrice"
+        description="Un email d'invitation sera envoyé pour finaliser la création du compte."
+      >
+        <form onSubmit={handleInvite} className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Prénom">
+              <input
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className={fieldInputClass}
+              />
+            </Field>
+            <Field label="Nom">
+              <input
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={fieldInputClass}
+              />
+            </Field>
+          </div>
+          <Field label="Email professionnel">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="vous@stf-organisation.org"
+              className={fieldInputClass}
+            />
+          </Field>
+          <Field label="Programme (optionnel)">
+            <input
+              value={program}
+              onChange={(e) => setProgram(e.target.value)}
+              placeholder="Ex. Mentorat STIM"
+              className={fieldInputClass}
+            />
+          </Field>
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+            >
+              Envoyer l&apos;invitation
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
