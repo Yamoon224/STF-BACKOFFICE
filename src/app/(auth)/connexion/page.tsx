@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 export default function ConnexionPage() {
   return (
@@ -31,8 +32,7 @@ export default function ConnexionPage() {
         </div>
         <div>
           <label className="text-sm font-semibold text-stf-navy dark:text-white">Mot de passe</label>
-          <input
-            type="password"
+          <PasswordInput
             required
             className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-stf-blue dark:border-border-default dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
             placeholder="••••••••"
