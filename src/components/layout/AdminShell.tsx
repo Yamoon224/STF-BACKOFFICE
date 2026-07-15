@@ -115,19 +115,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       ) : null}
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setOpen(true)}
               aria-label="Ouvrir le menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 lg:hidden"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 lg:hidden"
             >
               ☰
             </button>
-            <h1 className="text-lg font-semibold text-stf-navy">{pageTitle(pathname)}</h1>
+            <h1 className="truncate text-lg font-semibold text-stf-navy">{pageTitle(pathname)}</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <input
               type="search"
               placeholder="Rechercher…"
@@ -135,12 +135,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
             />
             <button
               aria-label="Notifications"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500"
             >
               🔔
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-stf-orange" />
             </button>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange lg:hidden">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange lg:hidden">
               AS
             </span>
           </div>
