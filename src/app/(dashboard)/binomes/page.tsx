@@ -1,15 +1,19 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { pairings } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import { statusLabel } from "@/lib/format";
+import type { MentorshipPairing } from "@/lib/types";
 
-export default function BinomesPage() {
+export default async function BinomesPage() {
+  const { data: pairings } = await apiFetch<{ data: MentorshipPairing[] }>("/pairings");
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 dark:text-slate-400">
         Suivi des binômes, des sessions et des alertes d&apos;inactivité.
       </p>
 
-      <Card title="Binômes actifs">
+      <Card title="Binômes">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
@@ -23,13 +27,13 @@ export default function BinomesPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {pairings.map((p) => (
-                <tr key={p.mentee}>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{p.mentee}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.mentor}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.program}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.sessions}</td>
+                <tr key={p.id}>
+                  <td className="py-4 font-medium text-stf-navy dark:text-white">{p.mentee.name}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.mentor?.name ?? "—"}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.program.name}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.sessions_realisees_count ?? 0}</td>
                   <td className="py-4">
-                    <Badge tone={p.status === "Actif" ? "green" : "orange"}>{p.status}</Badge>
+                    <Badge tone={p.status === "actif" ? "green" : "orange"}>{statusLabel(p.status)}</Badge>
                   </td>
                 </tr>
               ))}

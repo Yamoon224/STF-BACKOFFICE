@@ -1,8 +1,13 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { signalements } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import { updateReportStatusAction } from "@/lib/actions/admin";
+import { formatDateTime, statusLabel } from "@/lib/format";
+import type { Report } from "@/lib/types";
 
-export default function SignalementsPage() {
+export default async function SignalementsPage() {
+  const reports = await apiFetch<Report[]>("/reports");
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -23,19 +28,37 @@ export default function SignalementsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {signalements.map((s) => (
+              {reports.map((s) => (
                 <tr key={s.id}>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{s.id}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{s.context}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{s.reporter}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{s.date}</td>
+                  <td className="py-4 font-medium text-stf-navy dark:text-white">#{s.id}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">
+                    {s.context_type}
+                    {s.context_id ? ` #${s.context_id}` : ""}
+                  </td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{s.reporter.name}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{formatDateTime(s.created_at)}</td>
                   <td className="py-4">
-                    <Badge tone={s.status === "Résolu" ? "green" : "red"}>{s.status}</Badge>
+                    <Badge tone={s.status === "resolu" ? "green" : s.status === "en_cours" ? "orange" : "red"}>
+                      {statusLabel(s.status)}
+                    </Badge>
                   </td>
                   <td className="py-4">
-                    <button className="text-sm font-semibold text-stf-blue hover:text-stf-orange">
-                      Examiner
-                    </button>
+                    <div className="flex gap-2">
+                      {s.status === "nouveau" ? (
+                        <form action={updateReportStatusAction.bind(null, s.id, "en_cours")}>
+                          <button className="text-sm font-semibold text-stf-blue hover:text-stf-orange">
+                            Examiner
+                          </button>
+                        </form>
+                      ) : null}
+                      {s.status !== "resolu" ? (
+                        <form action={updateReportStatusAction.bind(null, s.id, "resolu")}>
+                          <button className="text-sm font-semibold text-stf-green hover:text-stf-orange">
+                            Résoudre
+                          </button>
+                        </form>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               ))}

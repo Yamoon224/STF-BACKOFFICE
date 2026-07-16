@@ -1,13 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { useActionState } from "react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { loginAction, type AuthActionState } from "@/lib/actions/auth";
 
 export default function ConnexionPage() {
   const { t } = useLanguage();
+  const [state, formAction, pending] = useActionState<AuthActionState, FormData>(loginAction, null);
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl dark:bg-surface">
@@ -29,11 +32,12 @@ export default function ConnexionPage() {
         {t("connexion.description")}
       </p>
 
-      <form className="mt-8 space-y-5">
+      <form action={formAction} className="mt-8 space-y-5">
         <div>
           <label className="text-sm font-semibold text-stf-navy dark:text-white">{t("connexion.email")}</label>
           <input
             type="email"
+            name="email"
             required
             className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-stf-blue dark:border-border-default dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
             placeholder="vous@stf-organisation.org"
@@ -42,6 +46,7 @@ export default function ConnexionPage() {
         <div>
           <label className="text-sm font-semibold text-stf-navy dark:text-white">{t("connexion.password")}</label>
           <PasswordInput
+            name="password"
             required
             className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-stf-blue dark:border-border-default dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
             placeholder="••••••••"
@@ -51,16 +56,24 @@ export default function ConnexionPage() {
           <label className="text-sm font-semibold text-stf-navy dark:text-white">{t("connexion.mfa")}</label>
           <input
             type="text"
+            name="code"
             inputMode="numeric"
             className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-stf-blue dark:border-border-default dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
             placeholder="123 456"
           />
+          {state?.mfaRequired ? (
+            <p className="mt-1 text-xs text-stf-orange">Double authentification requise pour ce compte.</p>
+          ) : null}
         </div>
+
+        {state?.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
+
         <button
           type="submit"
-          className="w-full rounded-full bg-stf-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-stf-orange/90"
+          disabled={pending}
+          className="w-full rounded-full bg-stf-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-stf-orange/90 disabled:opacity-60"
         >
-          {t("connexion.submit")}
+          {pending ? "Connexion…" : t("connexion.submit")}
         </button>
       </form>
 

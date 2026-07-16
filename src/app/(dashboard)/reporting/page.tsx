@@ -1,9 +1,18 @@
 import { Card } from "@/components/ui/Card";
-import { reports, activityByProgram } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import type { ActivityByProgram } from "@/lib/types";
 
 const filters = ["Période", "Programme", "Cohorte", "Pays", "Niveau", "Statut"];
 
-export default function ReportingPage() {
+const plannedExports = [
+  { name: "Rapport trimestriel", program: "Tous programmes", format: "PDF" },
+  { name: "Export utilisatrices actives", program: "Tous programmes", format: "CSV" },
+  { name: "Indicateurs bailleur", program: "Tous programmes", format: "PDF" },
+];
+
+export default async function ReportingPage() {
+  const activityByProgram = await apiFetch<ActivityByProgram[]>("/dashboard/activity-by-program");
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -29,16 +38,14 @@ export default function ReportingPage() {
                 <th className="pb-3">Programme</th>
                 <th className="pb-3">Mentées</th>
                 <th className="pb-3">Sessions</th>
-                <th className="pb-3">Rétention</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {activityByProgram.map((row) => (
-                <tr key={row.program}>
-                  <td className="py-3 font-medium text-stf-navy dark:text-white">{row.program}</td>
-                  <td className="py-3 text-slate-500 dark:text-slate-400">{row.mentees.toLocaleString("fr-FR")}</td>
-                  <td className="py-3 text-slate-500 dark:text-slate-400">{row.sessions.toLocaleString("fr-FR")}</td>
-                  <td className="py-3 text-slate-500 dark:text-slate-400">{row.retention}%</td>
+                <tr key={row.id}>
+                  <td className="py-3 font-medium text-stf-navy dark:text-white">{row.name}</td>
+                  <td className="py-3 text-slate-500 dark:text-slate-400">{row.mentees_count.toLocaleString("fr-FR")}</td>
+                  <td className="py-3 text-slate-500 dark:text-slate-400">{row.sessions_count.toLocaleString("fr-FR")}</td>
                 </tr>
               ))}
             </tbody>
@@ -48,7 +55,7 @@ export default function ReportingPage() {
 
       <Card title="Exports disponibles">
         <div className="space-y-3">
-          {reports.map((r) => (
+          {plannedExports.map((r) => (
             <div
               key={r.name}
               className="flex items-center justify-between rounded-xl border border-slate-100 p-4 dark:border-border-subtle"
@@ -57,7 +64,11 @@ export default function ReportingPage() {
                 <p className="text-sm font-semibold text-stf-navy dark:text-white">{r.name}</p>
                 <p className="text-xs text-slate-400 dark:text-slate-500">{r.program}</p>
               </div>
-              <button className="rounded-full border border-stf-blue px-4 py-2 text-xs font-semibold text-stf-blue hover:bg-stf-blue-light dark:hover:bg-stf-blue/15">
+              <button
+                disabled
+                title="Génération de fichiers à venir"
+                className="cursor-not-allowed rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-400 dark:border-border-default dark:text-slate-500"
+              >
                 Exporter {r.format}
               </button>
             </div>

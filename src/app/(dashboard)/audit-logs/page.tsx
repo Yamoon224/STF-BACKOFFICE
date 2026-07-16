@@ -1,7 +1,11 @@
 import { Card } from "@/components/ui/Card";
-import { auditLogs } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import { formatDateTime } from "@/lib/format";
+import type { AuditLog } from "@/lib/types";
 
-export default function AuditLogsPage() {
+export default async function AuditLogsPage() {
+  const { data: logs } = await apiFetch<{ data: AuditLog[] }>("/audit-logs");
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -20,12 +24,16 @@ export default function AuditLogsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {auditLogs.map((log, i) => (
-                <tr key={i}>
-                  <td className="py-4 font-mono text-xs text-slate-500 dark:text-slate-400">{log.time}</td>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{log.actor}</td>
+              {logs.map((log) => (
+                <tr key={log.id}>
+                  <td className="py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+                    {formatDateTime(log.created_at)}
+                  </td>
+                  <td className="py-4 font-medium text-stf-navy dark:text-white">{log.actor?.name ?? "Système"}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{log.action}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{log.target}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">
+                    {log.target_type ? `${log.target_type} #${log.target_id}` : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>

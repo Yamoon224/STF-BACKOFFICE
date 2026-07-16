@@ -1,8 +1,12 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { roles } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import { roleLabel } from "@/lib/format";
+import type { Role } from "@/lib/types";
 
-export default function ParametresPage() {
+export default async function ParametresPage() {
+  const roles = await apiFetch<Role[]>("/roles");
+
   return (
     <div className="space-y-6">
       <Card title="Rôles et permissions">
@@ -17,11 +21,15 @@ export default function ParametresPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {roles.map((r) => (
-                <tr key={r.name}>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{r.name}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{r.access}</td>
+                <tr key={r.id}>
+                  <td className="py-4 font-medium text-stf-navy dark:text-white">{roleLabel(r.name)}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">
+                    {r.permissions.length > 0 ? r.permissions.join(", ") : "Accès selon affectation"}
+                  </td>
                   <td className="py-4">
-                    <Badge tone={r.mfa ? "green" : "neutral"}>{r.mfa ? "Obligatoire" : "Optionnel"}</Badge>
+                    <Badge tone={r.name === "admin" ? "green" : "neutral"}>
+                      {r.name === "admin" ? "Obligatoire" : "Optionnel"}
+                    </Badge>
                   </td>
                 </tr>
               ))}

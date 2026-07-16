@@ -1,8 +1,12 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { matchingSuggestions } from "@/lib/mock-data";
+import { apiFetch } from "@/lib/api";
+import { confirmMatchAction } from "@/lib/actions/admin";
+import type { MatchingSuggestion } from "@/lib/types";
 
-export default function MatchingPage() {
+export default async function MatchingPage() {
+  const suggestions = await apiFetch<MatchingSuggestion[]>("/matching/suggestions");
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 max-w-2xl dark:text-slate-400">
@@ -15,40 +19,46 @@ export default function MatchingPage() {
             <thead>
               <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
                 <th className="py-3">Mentée</th>
-                <th className="py-3">Niveau</th>
-                <th className="py-3">Intérêt</th>
+                <th className="py-3">Programme</th>
                 <th className="py-3">Mentore suggérée</th>
                 <th className="py-3">Score</th>
                 <th className="py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {matchingSuggestions.map((m) => (
-                <tr key={m.mentee}>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{m.mentee}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{m.level}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{m.interest}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{m.suggestedMentor}</td>
-                  <td className="py-4">
-                    <Badge tone={m.score >= 90 ? "green" : m.score >= 85 ? "blue" : "orange"}>
-                      {m.score}%
-                    </Badge>
-                  </td>
-                  <td className="py-4">
-                    <div className="flex flex-wrap gap-2">
-                      <button className="rounded-full bg-stf-green px-3 py-1.5 text-xs font-semibold text-white hover:bg-stf-green/90">
-                        Confirmer
-                      </button>
-                      <button className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5">
-                        Modifier
-                      </button>
-                      <button className="rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light dark:hover:bg-stf-red/15">
-                        Remplacer
-                      </button>
-                    </div>
+              {suggestions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                    Aucune mentée en attente de matching pour le moment.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                suggestions.map((m) => (
+                  <tr key={m.pairing_id}>
+                    <td className="py-4 font-medium text-stf-navy dark:text-white">{m.mentee.name}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{m.program.name}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{m.suggested_mentor?.name ?? "—"}</td>
+                    <td className="py-4">
+                      {m.score !== null ? (
+                        <Badge tone={m.score >= 90 ? "green" : m.score >= 85 ? "blue" : "orange"}>{m.score}%</Badge>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="py-4">
+                      {m.suggested_mentor ? (
+                        <form action={confirmMatchAction.bind(null, m.pairing_id, m.suggested_mentor.id)}>
+                          <button className="rounded-full bg-stf-green px-3 py-1.5 text-xs font-semibold text-white hover:bg-stf-green/90">
+                            Confirmer
+                          </button>
+                        </form>
+                      ) : (
+                        <span className="text-xs text-slate-400 dark:text-slate-500">Aucune mentore disponible</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

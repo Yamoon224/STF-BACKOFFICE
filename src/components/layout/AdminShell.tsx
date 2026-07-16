@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { currentUser } from "@/lib/mock-data";
 import { UserMenu } from "./UserMenu";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
@@ -92,7 +91,19 @@ function NavList({
   );
 }
 
-export function AdminShell({ children }: { children: ReactNode }) {
+export function AdminShell({
+  children,
+  userName,
+  userEmail,
+  userInitials,
+  userAccess,
+}: {
+  children: ReactNode;
+  userName: string;
+  userEmail: string;
+  userInitials: string;
+  userAccess: string;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
@@ -110,14 +121,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="mx-3 mt-6">
           <UserMenu
             panelClassName="bottom-full left-0 mb-2"
+            userName={userName}
+            userEmail={userEmail}
             trigger={
               <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange">
-                  {currentUser.initials}
+                  {userInitials}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-stf-navy dark:text-white">{currentUser.name}</p>
-                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">{currentUser.access}</p>
+                  <p className="truncate text-sm font-semibold text-stf-navy dark:text-white">{userName}</p>
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">{userAccess}</p>
                 </div>
               </div>
             }
@@ -161,18 +174,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <LanguageToggle />
             <ThemeToggle />
             <button
+              disabled
               aria-label={t("topbar.notifications")}
-              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 dark:border-border-default dark:text-slate-300"
+              title="Notifications à venir"
+              className="flex h-10 w-10 shrink-0 cursor-not-allowed items-center justify-center rounded-full border border-slate-200 text-slate-300 dark:border-border-default dark:text-slate-600"
             >
               🔔
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-stf-orange" />
             </button>
             <div className="lg:hidden">
               <UserMenu
                 panelClassName="right-0 top-full mt-2"
+                userName={userName}
+                userEmail={userEmail}
                 trigger={
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-sm font-bold text-stf-orange">
-                    {currentUser.initials}
+                    {userInitials}
                   </span>
                 }
               />
