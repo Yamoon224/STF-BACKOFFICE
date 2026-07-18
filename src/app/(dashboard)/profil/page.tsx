@@ -5,6 +5,7 @@ import { getSessionUser, initials } from "@/lib/session";
 import { logoutAction } from "@/lib/actions/auth";
 import { formatDateTime, roleLabel } from "@/lib/format";
 import { ChangePasswordForm } from "./ChangePasswordForm";
+import { MfaForm } from "./MfaForm";
 
 export default async function ProfilPage() {
   const user = await getSessionUser();
@@ -50,11 +51,16 @@ export default async function ProfilPage() {
 
         <Card title="Sécurité">
           <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
-            <li className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
-              Authentification multi-facteurs (MFA)
-              <Badge tone={user?.mfa_enabled ? "green" : "orange"}>
-                {user?.mfa_enabled ? "Activée" : "Désactivée"}
-              </Badge>
+            <li className="rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
+              <div className="flex items-center justify-between gap-3">
+                Authentification multi-facteurs (MFA)
+                <Badge tone={user?.mfa_enabled ? "green" : "orange"}>
+                  {user?.mfa_enabled ? "Activée" : "Désactivée"}
+                </Badge>
+              </div>
+              <div className="mt-3">
+                <MfaForm mfaEnabled={user?.mfa_enabled ?? false} />
+              </div>
             </li>
             <li className="rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
               <p className="mb-3 flex items-center justify-between">

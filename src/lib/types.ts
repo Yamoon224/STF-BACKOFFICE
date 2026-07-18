@@ -10,6 +10,8 @@ export type AdminUser = {
   email: string;
   status: "pending" | "active" | "suspended";
   country: string | null;
+  phone: string | null;
+  locale: string;
   roles: { name: string }[];
   mentor_profile: { id: number; expertise: string; capacity: number; validated_at: string | null } | null;
   mentee_profile: { id: number; level: string | null } | null;
@@ -42,12 +44,29 @@ export type MentorshipPairing = {
   mentee_id: number;
   mentor_id: number | null;
   program_id: number;
+  cohort_id: number | null;
   status: "en_attente" | "actif" | "pause" | "termine";
   match_score: number | null;
+  notes: string | null;
   mentee: UserRef;
   mentor: UserRef | null;
   program: { id: number; name: string };
   sessions_realisees_count?: number;
+};
+
+export type MentorshipSession = {
+  id: number;
+  pairing_id: number;
+  scheduled_at: string;
+  duration_minutes: number | null;
+  status: "en_attente" | "confirmee" | "realisee" | "annulee";
+  topic: string | null;
+  location_or_link: string | null;
+  pairing: {
+    id: number;
+    mentee: UserRef;
+    mentor: UserRef | null;
+  };
 };
 
 export type MatchingSuggestion = {
@@ -66,6 +85,14 @@ export type Group = {
   members_count?: number;
 };
 
+export type GroupMember = UserRef & {
+  pivot: { role_in_group: "membre" | "animatrice"; joined_at: string };
+};
+
+export type GroupDetail = Group & {
+  members: GroupMember[];
+};
+
 export type CmsPage = {
   id: number;
   title: string;
@@ -73,7 +100,34 @@ export type CmsPage = {
   type: "page" | "article";
   status: "brouillon" | "publie";
   category: string | null;
+  body?: string | null;
+  excerpt?: string | null;
   updated_at: string;
+};
+
+export type Partner = {
+  id: number;
+  name: string;
+  logo_path: string | null;
+  url: string | null;
+  order: number;
+};
+
+export type Testimonial = {
+  id: number;
+  name: string;
+  role: string;
+  quote: string;
+  program_id: number | null;
+  order: number;
+};
+
+export type Faq = {
+  id: number;
+  question: string;
+  answer: string;
+  category: string | null;
+  order: number;
 };
 
 export type Report = {

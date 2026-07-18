@@ -33,6 +33,9 @@ const STATUS_LABELS: Record<string, string> = {
   automatique: "Automatique",
   travail: "Travail",
   mentorat: "Mentorat",
+  confirmee: "Confirmée",
+  realisee: "Réalisée",
+  annulee: "Annulée",
 };
 
 export function statusLabel(status: string): string {

@@ -6,7 +6,13 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
-import { activateUserAction, inviteUserAction, suspendUserAction, validateMentorAction } from "@/lib/actions/admin";
+import {
+  activateUserAction,
+  inviteUserAction,
+  suspendUserAction,
+  updateUserAction,
+  validateMentorAction,
+} from "@/lib/actions/admin";
 import { roleLabel, statusLabel } from "@/lib/format";
 import type { AdminUser } from "@/lib/types";
 
@@ -15,6 +21,14 @@ const statusTone = {
   pending: "orange",
   suspended: "red",
 } as const;
+
+const roleOptions = [
+  { label: "Administratrice STF", value: "admin" },
+  { label: "Collaboratrice STF", value: "staff" },
+  { label: "Mentore", value: "mentor" },
+  { label: "Mentée", value: "mentee" },
+  { label: "Bailleur / partenaire", value: "donor" },
+];
 
 export function UtilisatricesClient({
   users,
@@ -26,12 +40,21 @@ export function UtilisatricesClient({
   roleFilters: { label: string; value: string | null }[];
 }) {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<AdminUser | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleInvite(formData: FormData) {
     startTransition(async () => {
       await inviteUserAction(formData);
       setOpen(false);
+    });
+  }
+
+  function handleUpdate(formData: FormData) {
+    if (!editing) return;
+    startTransition(async () => {
+      await updateUserAction(editing.id, formData);
+      setEditing(null);
     });
   }
 
@@ -117,6 +140,12 @@ export function UtilisatricesClient({
                           </button>
                         </form>
                       ) : null}
+                      <button
+                        onClick={() => setEditing(u)}
+                        className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                      >
+                        Modifier
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -161,6 +190,62 @@ export function UtilisatricesClient({
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        title="Modifier l'utilisatrice"
+        description="Informations de profil et rôle RBAC."
+      >
+        {editing ? (
+          <form action={handleUpdate} className="space-y-5">
+            <Field label="Nom">
+              <input required name="name" defaultValue={editing.name} className={fieldInputClass} />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Pays">
+                <input name="country" defaultValue={editing.country ?? ""} className={fieldInputClass} />
+              </Field>
+              <Field label="Téléphone">
+                <input name="phone" defaultValue={editing.phone ?? ""} className={fieldInputClass} />
+              </Field>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Langue">
+                <select name="locale" defaultValue={editing.locale} className={fieldInputClass}>
+                  <option value="fr">Français</option>
+                  <option value="en">Anglais</option>
+                </select>
+              </Field>
+              <Field label="Rôle">
+                <select name="role" defaultValue={editing.roles[0]?.name ?? ""} className={fieldInputClass}>
+                  {roleOptions.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={pending}
+                className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        ) : null}
       </Modal>
     </div>
   );
