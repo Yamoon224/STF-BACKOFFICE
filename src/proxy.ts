@@ -14,8 +14,7 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(AUTH_COOKIE)?.value;
   if (!token) {
     const loginUrl = new URL("/connexion", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.rewrite(loginUrl);
   }
 
   return NextResponse.next();
