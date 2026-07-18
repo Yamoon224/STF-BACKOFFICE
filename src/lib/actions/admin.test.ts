@@ -15,6 +15,11 @@ function formData(fields: Record<string, string>): FormData {
   return fd;
 }
 
+function fdEntries(body: unknown): Record<string, FormDataEntryValue> {
+  expect(body).toBeInstanceOf(FormData);
+  return Object.fromEntries((body as FormData).entries());
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -341,19 +346,36 @@ describe("partner actions", () => {
     const { createPartnerAction, updatePartnerAction, deletePartnerAction } = await import("./admin");
 
     await createPartnerAction(formData({ name: "ACME", url: "https://acme.org" }));
-    expect(apiFetchMock).toHaveBeenCalledWith("/partners", {
-      method: "POST",
-      body: { name: "ACME", url: "https://acme.org" },
-    });
+    expect(apiFetchMock).toHaveBeenCalledWith("/partners", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({ name: "ACME", url: "https://acme.org" });
 
     await updatePartnerAction(1, formData({ name: "ACME Corp" }));
-    expect(apiFetchMock).toHaveBeenCalledWith("/partners/1", {
-      method: "PATCH",
-      body: { name: "ACME Corp", url: null },
+    expect(apiFetchMock).toHaveBeenCalledWith("/partners/1", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[1][1].body)).toEqual({
+      _method: "PATCH",
+      name: "ACME Corp",
+      url: "",
     });
 
     await deletePartnerAction(1);
     expect(apiFetchMock).toHaveBeenCalledWith("/partners/1", { method: "DELETE" });
+  });
+
+  it("uploads a logo file when provided, and forwards remove_logo otherwise", async () => {
+    const { createPartnerAction, updatePartnerAction } = await import("./admin");
+
+    const logo = new File(["fake-image-bytes"], "logo.png", { type: "image/png" });
+    const withLogo = formData({ name: "ACME" });
+    withLogo.set("logo", logo);
+    await createPartnerAction(withLogo);
+    const created = fdEntries(apiFetchMock.mock.calls[0][1].body);
+    expect(created.logo).toBe(logo);
+
+    const removing = formData({ name: "ACME", remove_logo: "on" });
+    await updatePartnerAction(1, removing);
+    const updated = fdEntries(apiFetchMock.mock.calls[1][1].body);
+    expect(updated.remove_logo).toBe("1");
+    expect(updated.logo).toBeUndefined();
   });
 });
 

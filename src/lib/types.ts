@@ -109,6 +109,7 @@ export type Partner = {
   id: number;
   name: string;
   logo_path: string | null;
+  logo_url: string | null;
   url: string | null;
   order: number;
 };

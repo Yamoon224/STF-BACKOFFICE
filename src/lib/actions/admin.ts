@@ -261,24 +261,33 @@ export async function deleteCmsPageAction(pageId: number): Promise<void> {
 }
 
 export async function createPartnerAction(formData: FormData): Promise<void> {
-  await apiFetch("/partners", {
-    method: "POST",
-    body: {
-      name: String(formData.get("name") ?? ""),
-      url: String(formData.get("url") ?? "") || null,
-    },
-  });
+  const payload = new FormData();
+  payload.set("name", String(formData.get("name") ?? ""));
+  payload.set("url", String(formData.get("url") ?? ""));
+
+  const logo = formData.get("logo");
+  if (logo instanceof File && logo.size > 0) {
+    payload.set("logo", logo);
+  }
+
+  await apiFetch("/partners", { method: "POST", body: payload });
   revalidatePath("/cms");
 }
 
 export async function updatePartnerAction(partnerId: number, formData: FormData): Promise<void> {
-  await apiFetch(`/partners/${partnerId}`, {
-    method: "PATCH",
-    body: {
-      name: String(formData.get("name") ?? ""),
-      url: String(formData.get("url") ?? "") || null,
-    },
-  });
+  const payload = new FormData();
+  payload.set("_method", "PATCH");
+  payload.set("name", String(formData.get("name") ?? ""));
+  payload.set("url", String(formData.get("url") ?? ""));
+
+  const logo = formData.get("logo");
+  if (logo instanceof File && logo.size > 0) {
+    payload.set("logo", logo);
+  } else if (formData.get("remove_logo")) {
+    payload.set("remove_logo", "1");
+  }
+
+  await apiFetch(`/partners/${partnerId}`, { method: "POST", body: payload });
   revalidatePath("/cms");
 }
 

@@ -280,6 +280,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
           <table className="w-full min-w-[480px] text-left text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
+                <th className="py-3">Logo</th>
                 <th className="py-3">Nom</th>
                 <th className="py-3">Site web</th>
                 <th className="py-3">Actions</th>
@@ -288,13 +289,27 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {partners.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                  <td colSpan={4} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                     Aucun partenaire pour le moment.
                   </td>
                 </tr>
               ) : (
                 partners.map((p) => (
                   <tr key={p.id}>
+                    <td className="py-4">
+                      {p.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={p.logo_url}
+                          alt={p.name}
+                          className="h-10 w-10 rounded-lg border border-slate-100 object-contain dark:border-border-default"
+                        />
+                      ) : (
+                        <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
+                          —
+                        </span>
+                      )}
+                    </td>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{p.name}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{p.url ?? "—"}</td>
                     <td className="py-4">
@@ -326,6 +341,9 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
           <Field label="Site web">
             <input name="url" type="url" placeholder="https://" className={fieldInputClass} />
           </Field>
+          <Field label="Logo (optionnel)">
+            <input name="logo" type="file" accept="image/*" className={fieldInputClass} />
+          </Field>
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
@@ -353,6 +371,25 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
             </Field>
             <Field label="Site web">
               <input name="url" type="url" defaultValue={editing.url ?? ""} className={fieldInputClass} />
+            </Field>
+            <Field label="Logo (optionnel)">
+              <div className="space-y-2">
+                {editing.logo_url ? (
+                  <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={editing.logo_url}
+                      alt={editing.name}
+                      className="h-12 w-12 rounded-lg border border-slate-100 object-contain dark:border-border-default"
+                    />
+                    <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <input type="checkbox" name="remove_logo" className="rounded border-slate-300" />
+                      Retirer le logo actuel
+                    </label>
+                  </div>
+                ) : null}
+                <input name="logo" type="file" accept="image/*" className={fieldInputClass} />
+              </div>
             </Field>
             <div className="flex justify-end gap-3 pt-2">
               <button

@@ -34,15 +34,17 @@ export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptio
     bearer = cookieStore.get(AUTH_COOKIE)?.value ?? null;
   }
 
+  const isFormData = body instanceof FormData;
+
   const res = await fetch(`${API_URL}${path}`, {
     ...rest,
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       ...headers,
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
     cache: "no-store",
   });
 
