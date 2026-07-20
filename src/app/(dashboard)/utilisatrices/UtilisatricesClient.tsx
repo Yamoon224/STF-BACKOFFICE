@@ -8,7 +8,9 @@ import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
 import {
   activateUserAction,
+  deleteUserAction,
   inviteUserAction,
+  resetUserPasswordAction,
   suspendUserAction,
   updateUserAction,
   validateMentorAction,
@@ -34,13 +36,18 @@ export function UtilisatricesClient({
   users,
   currentRole,
   roleFilters,
+  isAdmin,
+  currentUserId,
 }: {
   users: AdminUser[];
   currentRole: string | null;
   roleFilters: { label: string; value: string | null }[];
+  isAdmin: boolean;
+  currentUserId: number | null;
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<AdminUser | null>(null);
+  const [resetPasswordResult, setResetPasswordResult] = useState<{ name: string; password: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleInvite(formData: FormData) {
@@ -55,6 +62,21 @@ export function UtilisatricesClient({
     startTransition(async () => {
       await updateUserAction(editing.id, formData);
       setEditing(null);
+    });
+  }
+
+  function handleResetPassword(user: AdminUser) {
+    if (!confirm(`Réinitialiser le mot de passe de ${user.name} ?`)) return;
+    startTransition(async () => {
+      const password = await resetUserPasswordAction(user.id);
+      setResetPasswordResult({ name: user.name, password });
+    });
+  }
+
+  function handleDelete(user: AdminUser) {
+    if (!confirm(`Supprimer définitivement le compte de ${user.name} ? Cette action est irréversible.`)) return;
+    startTransition(async () => {
+      await deleteUserAction(user.id);
     });
   }
 
@@ -146,6 +168,24 @@ export function UtilisatricesClient({
                       >
                         Modifier
                       </button>
+                      {isAdmin ? (
+                        <button
+                          onClick={() => handleResetPassword(u)}
+                          disabled={pending}
+                          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                        >
+                          Réinitialiser le mot de passe
+                        </button>
+                      ) : null}
+                      {isAdmin && u.id !== currentUserId ? (
+                        <button
+                          onClick={() => handleDelete(u)}
+                          disabled={pending}
+                          className="rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
+                        >
+                          Supprimer
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -245,6 +285,29 @@ export function UtilisatricesClient({
               </button>
             </div>
           </form>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={resetPasswordResult !== null}
+        onClose={() => setResetPasswordResult(null)}
+        title="Mot de passe réinitialisé"
+        description={resetPasswordResult ? `Communiquez ce mot de passe à ${resetPasswordResult.name}.` : undefined}
+      >
+        {resetPasswordResult ? (
+          <div className="space-y-5">
+            <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center font-mono text-sm text-stf-navy dark:border-border-default dark:bg-white/5 dark:text-white">
+              {resetPasswordResult.password}
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setResetPasswordResult(null)}
+                className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
         ) : null}
       </Modal>
     </div>

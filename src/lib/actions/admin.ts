@@ -31,6 +31,17 @@ export async function activateUserAction(userId: number): Promise<void> {
   revalidatePath("/utilisatrices");
 }
 
+export async function resetUserPasswordAction(userId: number): Promise<string> {
+  const result = await apiFetch<{ password: string }>(`/users/${userId}/reset-password`, { method: "POST" });
+  revalidatePath("/utilisatrices");
+  return result.password;
+}
+
+export async function deleteUserAction(userId: number): Promise<void> {
+  await apiFetch(`/users/${userId}`, { method: "DELETE" });
+  revalidatePath("/utilisatrices");
+}
+
 export async function updateUserAction(userId: number, formData: FormData): Promise<void> {
   await apiFetch(`/users/${userId}`, {
     method: "PATCH",
