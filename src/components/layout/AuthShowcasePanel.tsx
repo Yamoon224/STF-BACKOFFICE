@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function AuthShowcasePanel() {
@@ -7,28 +8,16 @@ export function AuthShowcasePanel() {
 
   return (
     <div className="relative hidden overflow-hidden bg-stf-navy lg:block">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-          maskImage: "radial-gradient(85% 65% at 30% 30%, black 30%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(85% 65% at 30% 30%, black 30%, transparent 100%)",
-        }}
+      <Image
+        src="/brand/connexion-labo.jpg"
+        alt=""
+        fill
+        priority
+        sizes="50vw"
+        className="object-cover"
       />
-      <div
-        aria-hidden
-        className="absolute -top-24 -left-10 h-96 w-96 rounded-full opacity-50 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(245,148,31,0.35), transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="absolute bottom-0 right-0 h-80 w-80 rounded-full opacity-60 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(29,78,137,0.55), transparent 70%)" }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-stf-navy via-stf-navy/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-stf-navy via-stf-navy/60 to-stf-navy/10" />
+      <div className="absolute inset-0 bg-stf-navy/20" />
 
       <div className="relative flex h-full flex-col justify-end p-12 text-white">
         <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 backdrop-blur">
