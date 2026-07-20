@@ -4,6 +4,15 @@ export type UserRef = {
   email: string;
 };
 
+/** Shape of a Laravel paginator response. */
+export type Paginated<T> = {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
+
 export type AdminUser = {
   id: number;
   name: string;
@@ -197,4 +206,49 @@ export type PageSection = {
   type: PageSectionType;
   payload: Record<string, unknown>;
   order: number;
+};
+
+export type Level = {
+  id: number;
+  name: string;
+  slug: string;
+  order: number;
+};
+
+export type Subject = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type Course = {
+  id: number;
+  level_id: number;
+  subject_id: number;
+  title: string;
+  description: string | null;
+  order: number;
+  status: "brouillon" | "publie";
+};
+
+export type Experiment = {
+  id: number;
+  subject_id: number;
+  level_id: number | null;
+  course_id: number | null;
+  title: string;
+  description: string | null;
+  instructions: string | null;
+  order: number;
+  status: "brouillon" | "publie";
+};
+
+export type LiveSession = {
+  id: number;
+  course_id: number;
+  title: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  meeting_link: string | null;
+  status: "a_venir" | "en_cours" | "termine";
 };

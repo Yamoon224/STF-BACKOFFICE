@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { Pagination, usePagination } from "@/components/ui/Pagination";
+import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import {
   createPairingAction,
   createSessionAction,
@@ -42,6 +44,8 @@ export function BinomesClient({
   const [editingPairing, setEditingPairing] = useState<MentorshipPairing | null>(null);
   const [sessionModal, setSessionModal] = useState<{ pairingId: number } | null>(null);
   const [pending, startTransition] = useTransition();
+  const pairingsPage = usePagination(pairings);
+  const sessionsPage = usePagination(sessions);
 
   function handleCreatePairing(formData: FormData) {
     startTransition(async () => {
@@ -93,9 +97,10 @@ export function BinomesClient({
         </p>
         <button
           onClick={() => setCreatePairingOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Créer un binôme
+          <PlusIcon className="h-4 w-4" />
+          Créer un binôme
         </button>
       </div>
 
@@ -113,7 +118,7 @@ export function BinomesClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {pairings.map((p) => (
+              {pairingsPage.pageItems.map((p) => (
                 <tr key={p.id}>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{p.mentee.name}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{p.mentor?.name ?? "—"}</td>
@@ -125,23 +130,26 @@ export function BinomesClient({
                     </Badge>
                   </td>
                   <td className="py-4">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       <button
                         onClick={() => setSessionModal({ pairingId: p.id })}
-                        className="text-xs font-semibold text-stf-blue hover:text-stf-orange"
+                        className="flex items-center gap-1 text-xs font-semibold text-stf-blue hover:text-stf-orange"
                       >
-                        + Session
+                        <PlusIcon className="h-3.5 w-3.5" />
+                        Session
                       </button>
                       <button
                         onClick={() => setEditingPairing(p)}
-                        className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                       >
+                        <PencilIcon className="h-3.5 w-3.5" />
                         Modifier
                       </button>
                       <button
                         onClick={() => handleDeletePairing(p.id)}
-                        className="text-xs font-semibold text-stf-red hover:text-stf-orange"
+                        className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
                       >
+                        <TrashIcon className="h-3.5 w-3.5" />
                         Supprimer
                       </button>
                     </div>
@@ -151,6 +159,13 @@ export function BinomesClient({
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={pairingsPage.page}
+          totalPages={pairingsPage.totalPages}
+          total={pairingsPage.total}
+          pageSize={pairingsPage.pageSize}
+          onChange={pairingsPage.setPage}
+        />
       </Card>
 
       <Card title="Sessions">
@@ -166,14 +181,14 @@ export function BinomesClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {sessions.length === 0 ? (
+              {sessionsPage.pageItems.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                     Aucune session planifiée.
                   </td>
                 </tr>
               ) : (
-                sessions.map((s) => (
+                sessionsPage.pageItems.map((s) => (
                   <tr key={s.id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">
                       {s.pairing.mentee.name} ⇄ {s.pairing.mentor?.name ?? "—"}
@@ -227,8 +242,9 @@ export function BinomesClient({
                         <button
                           disabled={pending}
                           onClick={() => handleDeleteSession(s.id)}
-                          className="text-xs font-semibold text-stf-red hover:text-stf-orange"
+                          className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
                         >
+                          <TrashIcon className="h-3.5 w-3.5" />
                           Supprimer
                         </button>
                       </div>
@@ -239,6 +255,13 @@ export function BinomesClient({
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={sessionsPage.page}
+          totalPages={sessionsPage.totalPages}
+          total={sessionsPage.total}
+          pageSize={sessionsPage.pageSize}
+          onChange={sessionsPage.setPage}
+        />
       </Card>
 
       <Modal open={createPairingOpen} onClose={() => setCreatePairingOpen(false)} title="Créer un binôme">

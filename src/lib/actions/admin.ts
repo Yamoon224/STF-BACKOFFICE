@@ -465,3 +465,117 @@ export async function disableMfaAction(
     throw error;
   }
 }
+
+// --- Expériences virtuelles : cours, labo, sessions live -------------------
+
+export async function createCourseAction(formData: FormData): Promise<void> {
+  await apiFetch("/courses", {
+    method: "POST",
+    body: {
+      level_id: Number(formData.get("level_id")),
+      subject_id: Number(formData.get("subject_id")),
+      title: String(formData.get("title") ?? ""),
+      description: String(formData.get("description") ?? "") || null,
+      order: Number(formData.get("order") ?? 0),
+      status: String(formData.get("status") ?? "brouillon"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function updateCourseAction(courseId: number, formData: FormData): Promise<void> {
+  await apiFetch(`/courses/${courseId}`, {
+    method: "PATCH",
+    body: {
+      level_id: Number(formData.get("level_id")),
+      subject_id: Number(formData.get("subject_id")),
+      title: String(formData.get("title") ?? ""),
+      description: String(formData.get("description") ?? "") || null,
+      order: Number(formData.get("order") ?? 0),
+      status: String(formData.get("status") ?? "brouillon"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function deleteCourseAction(courseId: number): Promise<void> {
+  await apiFetch(`/courses/${courseId}`, { method: "DELETE" });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function createExperimentAction(formData: FormData): Promise<void> {
+  const courseId = String(formData.get("course_id") ?? "");
+  const levelId = String(formData.get("level_id") ?? "");
+  await apiFetch("/experiments", {
+    method: "POST",
+    body: {
+      subject_id: Number(formData.get("subject_id")),
+      level_id: levelId ? Number(levelId) : null,
+      course_id: courseId ? Number(courseId) : null,
+      title: String(formData.get("title") ?? ""),
+      description: String(formData.get("description") ?? "") || null,
+      instructions: String(formData.get("instructions") ?? "") || null,
+      order: Number(formData.get("order") ?? 0),
+      status: String(formData.get("status") ?? "brouillon"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function updateExperimentAction(experimentId: number, formData: FormData): Promise<void> {
+  const courseId = String(formData.get("course_id") ?? "");
+  const levelId = String(formData.get("level_id") ?? "");
+  await apiFetch(`/experiments/${experimentId}`, {
+    method: "PATCH",
+    body: {
+      subject_id: Number(formData.get("subject_id")),
+      level_id: levelId ? Number(levelId) : null,
+      course_id: courseId ? Number(courseId) : null,
+      title: String(formData.get("title") ?? ""),
+      description: String(formData.get("description") ?? "") || null,
+      instructions: String(formData.get("instructions") ?? "") || null,
+      order: Number(formData.get("order") ?? 0),
+      status: String(formData.get("status") ?? "brouillon"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function deleteExperimentAction(experimentId: number): Promise<void> {
+  await apiFetch(`/experiments/${experimentId}`, { method: "DELETE" });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function createLiveSessionAction(formData: FormData): Promise<void> {
+  await apiFetch("/live-sessions", {
+    method: "POST",
+    body: {
+      course_id: Number(formData.get("course_id")),
+      title: String(formData.get("title") ?? ""),
+      scheduled_at: String(formData.get("scheduled_at") ?? ""),
+      duration_minutes: Number(formData.get("duration_minutes") ?? 60),
+      meeting_link: String(formData.get("meeting_link") ?? "") || null,
+      status: String(formData.get("status") ?? "a_venir"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function updateLiveSessionAction(sessionId: number, formData: FormData): Promise<void> {
+  await apiFetch(`/live-sessions/${sessionId}`, {
+    method: "PATCH",
+    body: {
+      title: String(formData.get("title") ?? ""),
+      scheduled_at: String(formData.get("scheduled_at") ?? ""),
+      duration_minutes: Number(formData.get("duration_minutes") ?? 60),
+      meeting_link: String(formData.get("meeting_link") ?? "") || null,
+      status: String(formData.get("status") ?? "a_venir"),
+    },
+  });
+  revalidatePath("/experiences-virtuelles");
+}
+
+export async function deleteLiveSessionAction(sessionId: number): Promise<void> {
+  await apiFetch(`/live-sessions/${sessionId}`, { method: "DELETE" });
+  revalidatePath("/experiences-virtuelles");
+}

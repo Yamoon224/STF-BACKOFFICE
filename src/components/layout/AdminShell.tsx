@@ -29,6 +29,7 @@ const navGroups: { titleKey: string; items: { href: string; labelKey: string; ic
     titleKey: "contenu",
     items: [
       { href: "/cms", labelKey: "cms", icon: "📝" },
+      { href: "/experiences-virtuelles", labelKey: "experiencesVirtuelles", icon: "🧪" },
       { href: "/reporting", labelKey: "reporting", icon: "📈" },
     ],
   },

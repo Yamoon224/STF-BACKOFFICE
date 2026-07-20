@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { Pagination, usePagination } from "@/components/ui/Pagination";
+import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import {
   createCohortAction,
   createProgramAction,
@@ -39,6 +41,7 @@ export function ProgrammesClient({
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
   const [cohortModal, setCohortModal] = useState<{ programId: number; cohort: Cohort | null } | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(programs);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -89,14 +92,15 @@ export function ProgrammesClient({
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Nouveau programme
+          <PlusIcon className="h-4 w-4" />
+          Nouveau programme
         </button>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        {programs.map((p) => (
+        {pageItems.map((p) => (
           <Card key={p.id}>
             <div className="flex items-start justify-between">
               <h2 className="font-semibold text-stf-navy dark:text-white">{p.name}</h2>
@@ -123,14 +127,16 @@ export function ProgrammesClient({
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setEditingProgram(p)}
-                className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
               >
+                <PencilIcon className="h-3.5 w-3.5" />
                 Modifier
               </button>
               <button
                 onClick={() => handleDeleteProgram(p.id)}
-                className="rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
+                className="flex items-center gap-1.5 rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
               >
+                <TrashIcon className="h-3.5 w-3.5" />
                 Supprimer
               </button>
             </div>
@@ -140,9 +146,10 @@ export function ProgrammesClient({
                 <p className="text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">Cohortes</p>
                 <button
                   onClick={() => setCohortModal({ programId: p.id, cohort: null })}
-                  className="text-xs font-semibold text-stf-blue hover:text-stf-orange"
+                  className="flex items-center gap-1 text-xs font-semibold text-stf-blue hover:text-stf-orange"
                 >
-                  + Ajouter une cohorte
+                  <PlusIcon className="h-3.5 w-3.5" />
+                  Ajouter une cohorte
                 </button>
               </div>
               <ul className="mt-2 space-y-2">
@@ -160,17 +167,19 @@ export function ProgrammesClient({
                           {formatDate(c.start_date)} – {formatDate(c.end_date)} · {statusLabel(c.status)}
                         </p>
                       </div>
-                      <div className="flex shrink-0 gap-2">
+                      <div className="flex shrink-0 gap-3">
                         <button
                           onClick={() => setCohortModal({ programId: p.id, cohort: c })}
-                          className="text-xs font-semibold text-stf-blue hover:text-stf-orange"
+                          className="flex items-center gap-1 text-xs font-semibold text-stf-blue hover:text-stf-orange"
                         >
+                          <PencilIcon className="h-3.5 w-3.5" />
                           Modifier
                         </button>
                         <button
                           onClick={() => handleDeleteCohort(c.id)}
-                          className="text-xs font-semibold text-stf-red hover:text-stf-orange"
+                          className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
                         >
+                          <TrashIcon className="h-3.5 w-3.5" />
                           Supprimer
                         </button>
                       </div>
@@ -182,6 +191,8 @@ export function ProgrammesClient({
           </Card>
         ))}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
 
       <Modal open={open} onClose={() => setOpen(false)} title="Nouveau programme">
         <form action={handleCreate} className="space-y-5">

@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { Pagination, usePagination } from "@/components/ui/Pagination";
+import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import { createGroupAction, deleteGroupAction, updateGroupAction } from "@/lib/actions/admin";
 import { statusLabel } from "@/lib/format";
 import type { Group } from "@/lib/types";
@@ -26,6 +28,7 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Group | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(groups);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -57,9 +60,10 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Créer un groupe
+          <PlusIcon className="h-4 w-4" />
+          Créer un groupe
         </button>
       </div>
 
@@ -76,7 +80,7 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {groups.map((g) => (
+              {pageItems.map((g) => (
                 <tr key={g.id}>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{g.name}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{statusLabel(g.type)}</td>
@@ -87,20 +91,22 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
                     </Badge>
                   </td>
                   <td className="py-4">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       <Link href={`/groupes/${g.id}`} className="text-xs font-semibold text-stf-blue hover:text-stf-orange">
                         Gérer les membres
                       </Link>
                       <button
                         onClick={() => setEditing(g)}
-                        className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                       >
+                        <PencilIcon className="h-3.5 w-3.5" />
                         Modifier
                       </button>
                       <button
                         onClick={() => handleDelete(g.id)}
-                        className="text-xs font-semibold text-stf-red hover:text-stf-orange"
+                        className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
                       >
+                        <TrashIcon className="h-3.5 w-3.5" />
                         Supprimer
                       </button>
                     </div>
@@ -110,6 +116,7 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
       </Card>
 
       <Modal

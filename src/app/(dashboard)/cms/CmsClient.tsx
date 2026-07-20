@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { Pagination, usePagination } from "@/components/ui/Pagination";
+import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import {
   createCmsPageAction,
   createFaqAction,
@@ -94,6 +96,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<CmsPage | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(cmsPages);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -122,9 +125,10 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
       <div className="flex justify-end">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Nouveau contenu
+          <PlusIcon className="h-4 w-4" />
+          Nouveau contenu
         </button>
       </div>
 
@@ -141,7 +145,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {cmsPages.map((c) => (
+              {pageItems.map((c) => (
                 <tr key={c.id}>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{c.title}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{statusLabel(c.type)}</td>
@@ -150,14 +154,19 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
                     <Badge tone={c.status === "publie" ? "green" : "neutral"}>{statusLabel(c.status)}</Badge>
                   </td>
                   <td className="py-4">
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <button
                         onClick={() => setEditing(c)}
-                        className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                       >
+                        <PencilIcon className="h-3.5 w-3.5" />
                         Modifier
                       </button>
-                      <button onClick={() => handleDelete(c.id)} className="text-xs font-semibold text-stf-red hover:text-stf-orange">
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
+                      >
+                        <TrashIcon className="h-3.5 w-3.5" />
                         Supprimer
                       </button>
                     </div>
@@ -167,6 +176,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
       </Card>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Nouveau contenu">
@@ -252,6 +262,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partner | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(partners);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -280,9 +291,10 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
       <div className="flex justify-end">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Ajouter un partenaire
+          <PlusIcon className="h-4 w-4" />
+          Ajouter un partenaire
         </button>
       </div>
 
@@ -298,14 +310,14 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {partners.length === 0 ? (
+              {pageItems.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                     Aucun partenaire pour le moment.
                   </td>
                 </tr>
               ) : (
-                partners.map((p) => (
+                pageItems.map((p) => (
                   <tr key={p.id}>
                     <td className="py-4">
                       {p.logo_url ? (
@@ -324,14 +336,19 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{p.name}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{p.url ?? "—"}</td>
                     <td className="py-4">
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         <button
                           onClick={() => setEditing(p)}
-                          className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                          className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                         >
+                          <PencilIcon className="h-3.5 w-3.5" />
                           Modifier
                         </button>
-                        <button onClick={() => handleDelete(p.id)} className="text-xs font-semibold text-stf-red hover:text-stf-orange">
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
                           Supprimer
                         </button>
                       </div>
@@ -342,6 +359,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
       </Card>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Ajouter un partenaire">
@@ -429,6 +447,7 @@ function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(testimonials);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -457,18 +476,19 @@ function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
       <div className="flex justify-end">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Ajouter un témoignage
+          <PlusIcon className="h-4 w-4" />
+          Ajouter un témoignage
         </button>
       </div>
 
       <Card>
         <div className="space-y-3">
-          {testimonials.length === 0 ? (
+          {pageItems.length === 0 ? (
             <p className="text-sm text-slate-400 dark:text-slate-500">Aucun témoignage pour le moment.</p>
           ) : (
-            testimonials.map((t) => (
+            pageItems.map((t) => (
               <div key={t.id} className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 p-4 dark:border-border-subtle">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-stf-navy dark:text-white">
@@ -476,14 +496,19 @@ function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
                   </p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">&laquo; {t.quote} &raquo;</p>
                 </div>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex shrink-0 gap-3">
                   <button
                     onClick={() => setEditing(t)}
-                    className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                    className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                   >
+                    <PencilIcon className="h-3.5 w-3.5" />
                     Modifier
                   </button>
-                  <button onClick={() => handleDelete(t.id)} className="text-xs font-semibold text-stf-red hover:text-stf-orange">
+                  <button
+                    onClick={() => handleDelete(t.id)}
+                    className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
+                  >
+                    <TrashIcon className="h-3.5 w-3.5" />
                     Supprimer
                   </button>
                 </div>
@@ -491,6 +516,7 @@ function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
             ))
           )}
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
       </Card>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Ajouter un témoignage">
@@ -566,6 +592,7 @@ function FaqsPanel({ faqs }: { faqs: Faq[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Faq | null>(null);
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(faqs);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
@@ -594,32 +621,38 @@ function FaqsPanel({ faqs }: { faqs: Faq[] }) {
       <div className="flex justify-end">
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Ajouter une question
+          <PlusIcon className="h-4 w-4" />
+          Ajouter une question
         </button>
       </div>
 
       <Card>
         <div className="space-y-3">
-          {faqs.length === 0 ? (
+          {pageItems.length === 0 ? (
             <p className="text-sm text-slate-400 dark:text-slate-500">Aucune question pour le moment.</p>
           ) : (
-            faqs.map((f) => (
+            pageItems.map((f) => (
               <div key={f.id} className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 p-4 dark:border-border-subtle">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-stf-navy dark:text-white">{f.question}</p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{f.answer}</p>
                   {f.category ? <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{f.category}</p> : null}
                 </div>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex shrink-0 gap-3">
                   <button
                     onClick={() => setEditing(f)}
-                    className="text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                    className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                   >
+                    <PencilIcon className="h-3.5 w-3.5" />
                     Modifier
                   </button>
-                  <button onClick={() => handleDelete(f.id)} className="text-xs font-semibold text-stf-red hover:text-stf-orange">
+                  <button
+                    onClick={() => handleDelete(f.id)}
+                    className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
+                  >
+                    <TrashIcon className="h-3.5 w-3.5" />
                     Supprimer
                   </button>
                 </div>
@@ -627,6 +660,7 @@ function FaqsPanel({ faqs }: { faqs: Faq[] }) {
             ))
           )}
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
       </Card>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Ajouter une question">
@@ -825,8 +859,9 @@ function PageSectionsPanel({ pageSections }: { pageSections: PageSection[] }) {
                 </div>
                 <button
                   onClick={() => setEditing(section)}
-                  className="shrink-0 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                  className="flex shrink-0 items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
                 >
+                  <PencilIcon className="h-3.5 w-3.5" />
                   Modifier
                 </button>
               </div>

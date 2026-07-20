@@ -1,10 +1,14 @@
-import { Card } from "@/components/ui/Card";
 import { apiFetch } from "@/lib/api";
-import { formatDateTime } from "@/lib/format";
-import type { AuditLog } from "@/lib/types";
+import type { AuditLog, Paginated } from "@/lib/types";
+import { AuditLogsClient } from "./AuditLogsClient";
 
-export default async function AuditLogsPage() {
-  const { data: logs } = await apiFetch<{ data: AuditLog[] }>("/audit-logs");
+export default async function AuditLogsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+  const logs = await apiFetch<Paginated<AuditLog>>(`/audit-logs${page ? `?page=${page}` : ""}`);
 
   return (
     <div className="space-y-6">
@@ -12,34 +16,15 @@ export default async function AuditLogsPage() {
         Journalisation des actions sensibles : connexion, consultation, validation, suspension, suppression, signalement.
       </p>
 
-      <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
-                <th className="py-3">Horodatage</th>
-                <th className="py-3">Actrice</th>
-                <th className="py-3">Action</th>
-                <th className="py-3">Cible</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
-              {logs.map((log) => (
-                <tr key={log.id}>
-                  <td className="py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
-                    {formatDateTime(log.created_at)}
-                  </td>
-                  <td className="py-4 font-medium text-stf-navy dark:text-white">{log.actor?.name ?? "Système"}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{log.action}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">
-                    {log.target_type ? `${log.target_type} #${log.target_id}` : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <AuditLogsClient
+        logs={logs.data}
+        pagination={{
+          currentPage: logs.current_page,
+          lastPage: logs.last_page,
+          total: logs.total,
+          perPage: logs.per_page,
+        }}
+      />
     </div>
   );
 }

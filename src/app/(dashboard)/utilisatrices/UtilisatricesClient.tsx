@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
+import { Pagination } from "@/components/ui/Pagination";
+import { PencilIcon, PlusIcon, TrashIcon, KeyIcon, CheckIcon, UndoIcon } from "@/components/ui/Icons";
 import {
   activateUserAction,
   deleteUserAction,
@@ -34,20 +37,30 @@ const roleOptions = [
 
 export function UtilisatricesClient({
   users,
+  pagination,
   currentRole,
   roleFilters,
   isAdmin,
   currentUserId,
 }: {
   users: AdminUser[];
+  pagination: { currentPage: number; lastPage: number; total: number; perPage: number };
   currentRole: string | null;
   roleFilters: { label: string; value: string | null }[];
   isAdmin: boolean;
   currentUserId: number | null;
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<AdminUser | null>(null);
   const [resetPasswordResult, setResetPasswordResult] = useState<{ name: string; password: string } | null>(null);
+
+  function goToPage(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`/utilisatrices?${params}`);
+  }
   const [pending, startTransition] = useTransition();
 
   function handleInvite(formData: FormData) {
@@ -88,9 +101,10 @@ export function UtilisatricesClient({
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
         >
-          + Inviter une collaboratrice
+          <PlusIcon className="h-4 w-4" />
+          Inviter une collaboratrice
         </button>
       </div>
 
@@ -137,8 +151,9 @@ export function UtilisatricesClient({
                         <form action={validateMentorAction.bind(null, u.id)}>
                           <button
                             disabled={pending}
-                            className="rounded-full bg-stf-green px-3 py-1.5 text-xs font-semibold text-white hover:bg-stf-green/90 disabled:opacity-50"
+                            className="flex items-center gap-1.5 rounded-full bg-stf-green px-3 py-1.5 text-xs font-semibold text-white hover:bg-stf-green/90 disabled:opacity-50"
                           >
+                            <CheckIcon className="h-3.5 w-3.5" />
                             Valider
                           </button>
                         </form>
@@ -146,8 +161,9 @@ export function UtilisatricesClient({
                         <form action={activateUserAction.bind(null, u.id)}>
                           <button
                             disabled={pending}
-                            className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                            className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
                           >
+                            <UndoIcon className="h-3.5 w-3.5" />
                             Réactiver
                           </button>
                         </form>
@@ -156,24 +172,27 @@ export function UtilisatricesClient({
                         <form action={suspendUserAction.bind(null, u.id)}>
                           <button
                             disabled={pending}
-                            className="rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
+                            className="flex items-center gap-1.5 rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
                           >
+                            <TrashIcon className="h-3.5 w-3.5" />
                             Suspendre
                           </button>
                         </form>
                       ) : null}
                       <button
                         onClick={() => setEditing(u)}
-                        className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                        className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
                       >
+                        <PencilIcon className="h-3.5 w-3.5" />
                         Modifier
                       </button>
                       {isAdmin ? (
                         <button
                           onClick={() => handleResetPassword(u)}
                           disabled={pending}
-                          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+                          className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
                         >
+                          <KeyIcon className="h-3.5 w-3.5" />
                           Réinitialiser le mot de passe
                         </button>
                       ) : null}
@@ -181,8 +200,9 @@ export function UtilisatricesClient({
                         <button
                           onClick={() => handleDelete(u)}
                           disabled={pending}
-                          className="rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
+                          className="flex items-center gap-1.5 rounded-full border border-stf-red/30 px-3 py-1.5 text-xs font-semibold text-stf-red hover:bg-stf-red-light disabled:opacity-50 dark:hover:bg-stf-red/15"
                         >
+                          <TrashIcon className="h-3.5 w-3.5" />
                           Supprimer
                         </button>
                       ) : null}
@@ -193,6 +213,13 @@ export function UtilisatricesClient({
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.lastPage}
+          total={pagination.total}
+          pageSize={pagination.perPage}
+          onChange={goToPage}
+        />
       </Card>
 
       <Modal

@@ -3,10 +3,13 @@
 import { useTransition } from "react";
 import { addGroupMemberAction, removeGroupMemberAction } from "@/lib/actions/admin";
 import { formatDate } from "@/lib/format";
+import { Pagination, usePagination } from "@/components/ui/Pagination";
+import { PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import type { AdminUser, GroupDetail } from "@/lib/types";
 
 export function GroupMembersClient({ group, allUsers }: { group: GroupDetail; allUsers: AdminUser[] }) {
   const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(group.members);
 
   const memberIds = new Set(group.members.map((m) => m.id));
   const candidates = allUsers.filter((u) => !memberIds.has(u.id));
@@ -27,10 +30,10 @@ export function GroupMembersClient({ group, allUsers }: { group: GroupDetail; al
   return (
     <div className="space-y-6">
       <ul className="space-y-2">
-        {group.members.length === 0 ? (
+        {pageItems.length === 0 ? (
           <li className="text-sm text-slate-400 dark:text-slate-500">Aucune membre pour le moment.</li>
         ) : (
-          group.members.map((m) => (
+          pageItems.map((m) => (
             <li
               key={m.id}
               className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 text-sm dark:border-border-subtle"
@@ -44,14 +47,16 @@ export function GroupMembersClient({ group, allUsers }: { group: GroupDetail; al
               <button
                 disabled={pending}
                 onClick={() => handleRemove(m.id)}
-                className="shrink-0 text-xs font-semibold text-stf-red hover:text-stf-orange disabled:opacity-50"
+                className="flex shrink-0 items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange disabled:opacity-50"
               >
+                <TrashIcon className="h-3.5 w-3.5" />
                 Retirer
               </button>
             </li>
           ))
         )}
       </ul>
+      <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
 
       <form action={handleAdd} className="flex flex-col gap-3 border-t border-slate-100 pt-5 dark:border-border-subtle sm:flex-row sm:items-end">
         <div className="flex-1">
@@ -86,8 +91,9 @@ export function GroupMembersClient({ group, allUsers }: { group: GroupDetail; al
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full bg-stf-orange px-5 py-3 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-3 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
         >
+          <PlusIcon className="h-4 w-4" />
           Ajouter
         </button>
       </form>

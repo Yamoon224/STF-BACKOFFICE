@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export const PAGE_SIZE = 10;
 
@@ -8,12 +8,9 @@ export const PAGE_SIZE = 10;
 export function usePagination<T>(items: T[], pageSize: number = PAGE_SIZE) {
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+  // Clamped for rendering: if the list shrinks (e.g. after a delete) this
+  // immediately reflects a valid page without a redundant effect + re-render.
   const safePage = Math.min(page, totalPages);
-
-  // Snap back to the last valid page if the list shrinks (e.g. after a delete).
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
 
   const pageItems = useMemo(
     () => items.slice((safePage - 1) * pageSize, safePage * pageSize),
@@ -46,7 +43,7 @@ export function Pagination({
   );
 
   return (
-    <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-1 pt-4 text-sm sm:flex-row dark:border-border-subtle">
+    <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-slate-100 px-1 pt-4 text-sm sm:flex-row dark:border-border-subtle">
       <p className="text-xs text-slate-400 dark:text-slate-500">
         {from}–{to} sur {total}
       </p>
