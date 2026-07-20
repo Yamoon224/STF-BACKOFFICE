@@ -47,6 +47,7 @@ export async function updateUserAction(userId: number, formData: FormData): Prom
     method: "PATCH",
     body: {
       name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
       country: String(formData.get("country") ?? "") || null,
       phone: String(formData.get("phone") ?? "") || null,
       locale: String(formData.get("locale") ?? "fr"),

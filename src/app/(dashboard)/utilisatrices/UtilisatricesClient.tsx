@@ -243,6 +243,9 @@ export function UtilisatricesClient({
             <Field label="Nom">
               <input required name="name" defaultValue={editing.name} className={fieldInputClass} />
             </Field>
+            <Field label="Email">
+              <input type="email" required name="email" defaultValue={editing.email} className={fieldInputClass} />
+            </Field>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Pays">
                 <input name="country" defaultValue={editing.country ?? ""} className={fieldInputClass} />

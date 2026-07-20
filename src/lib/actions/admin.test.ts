@@ -68,12 +68,19 @@ describe("updateUserAction", () => {
 
     await updateUserAction(
       9,
-      formData({ name: "Nouveau Nom", country: "Sénégal", phone: "+221000000", locale: "fr", role: "staff" })
+      formData({
+        name: "Nouveau Nom",
+        email: "nouveau@example.org",
+        country: "Sénégal",
+        phone: "+221000000",
+        locale: "fr",
+        role: "staff",
+      })
     );
 
     expect(apiFetchMock).toHaveBeenCalledWith("/users/9", {
       method: "PATCH",
-      body: { name: "Nouveau Nom", country: "Sénégal", phone: "+221000000", locale: "fr" },
+      body: { name: "Nouveau Nom", email: "nouveau@example.org", country: "Sénégal", phone: "+221000000", locale: "fr" },
     });
     expect(apiFetchMock).toHaveBeenCalledWith("/users/9/role", { method: "POST", body: { role: "staff" } });
     expect(revalidatePathMock).toHaveBeenCalledWith("/utilisatrices");
@@ -82,7 +89,7 @@ describe("updateUserAction", () => {
   it("skips the role call when no role is provided", async () => {
     const { updateUserAction } = await import("./admin");
 
-    await updateUserAction(9, formData({ name: "Nouveau Nom" }));
+    await updateUserAction(9, formData({ name: "Nouveau Nom", email: "nouveau@example.org" }));
 
     expect(apiFetchMock).toHaveBeenCalledTimes(1);
   });
