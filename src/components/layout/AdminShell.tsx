@@ -1,5 +1,23 @@
 "use client";
 
+import {
+  Bell,
+  FileText,
+  FlaskConical,
+  Flag,
+  Handshake,
+  LayoutDashboard,
+  Menu,
+  Settings,
+  Shield,
+  Target,
+  TrendingUp,
+  Link2,
+  Users,
+  UsersRound,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,35 +28,35 @@ import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { TranslateFn } from "@/lib/i18n/LanguageProvider";
 
-const navGroups: { titleKey: string; items: { href: string; labelKey: string; icon: string }[] }[] = [
+const navGroups: { titleKey: string; items: { href: string; labelKey: string; icon: LucideIcon }[] }[] = [
   {
     titleKey: "overview",
-    items: [{ href: "/", labelKey: "dashboard", icon: "📊" }],
+    items: [{ href: "/", labelKey: "dashboard", icon: LayoutDashboard }],
   },
   {
     titleKey: "mentorat",
     items: [
-      { href: "/utilisatrices", labelKey: "utilisatrices", icon: "👤" },
-      { href: "/programmes", labelKey: "programmes", icon: "🎯" },
-      { href: "/matching", labelKey: "matching", icon: "🔗" },
-      { href: "/binomes", labelKey: "binomes", icon: "🤝" },
-      { href: "/groupes", labelKey: "groupes", icon: "👥" },
+      { href: "/utilisatrices", labelKey: "utilisatrices", icon: Users },
+      { href: "/programmes", labelKey: "programmes", icon: Target },
+      { href: "/matching", labelKey: "matching", icon: Link2 },
+      { href: "/binomes", labelKey: "binomes", icon: Handshake },
+      { href: "/groupes", labelKey: "groupes", icon: UsersRound },
     ],
   },
   {
     titleKey: "contenu",
     items: [
-      { href: "/cms", labelKey: "cms", icon: "📝" },
-      { href: "/experiences-virtuelles", labelKey: "experiencesVirtuelles", icon: "🧪" },
-      { href: "/reporting", labelKey: "reporting", icon: "📈" },
+      { href: "/cms", labelKey: "cms", icon: FileText },
+      { href: "/experiences-virtuelles", labelKey: "experiencesVirtuelles", icon: FlaskConical },
+      { href: "/reporting", labelKey: "reporting", icon: TrendingUp },
     ],
   },
   {
     titleKey: "securite",
     items: [
-      { href: "/signalements", labelKey: "signalements", icon: "🚩" },
-      { href: "/audit-logs", labelKey: "auditLogs", icon: "🛡️" },
-      { href: "/parametres", labelKey: "parametres", icon: "⚙️" },
+      { href: "/signalements", labelKey: "signalements", icon: Flag },
+      { href: "/audit-logs", labelKey: "auditLogs", icon: Shield },
+      { href: "/parametres", labelKey: "parametres", icon: Settings },
     ],
   },
 ];
@@ -80,7 +98,7 @@ function NavList({
                       : "text-slate-500 hover:bg-slate-100 hover:text-stf-navy dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
                   }`}
                 >
-                  <span className="text-base">{item.icon}</span>
+                  <item.icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
                   {t(`nav.${item.labelKey}`)}
                 </Link>
               );
@@ -145,8 +163,8 @@ export function AdminShell({
           <aside className="absolute left-0 top-0 flex h-full w-72 flex-col overflow-y-auto bg-white py-6 shadow-xl dark:bg-surface">
             <div className="flex items-center justify-between px-6 pb-6">
               <span className="text-sm font-semibold text-stf-navy dark:text-white">{t("nav.backofficeStf")}</span>
-              <button onClick={() => setOpen(false)} aria-label={t("nav.fermer")} className="text-xl text-slate-500 dark:text-slate-300">
-                ✕
+              <button onClick={() => setOpen(false)} aria-label={t("nav.fermer")} className="text-slate-500 dark:text-slate-300">
+                <X className="h-5 w-5" strokeWidth={1.8} />
               </button>
             </div>
             <NavList pathname={pathname} t={t} onNavigate={() => setOpen(false)} />
@@ -162,7 +180,7 @@ export function AdminShell({
               aria-label={t("nav.ouvrirMenu")}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 dark:border-border-default lg:hidden"
             >
-              ☰
+              <Menu className="h-5 w-5" strokeWidth={1.8} />
             </button>
             <h1 className="truncate text-lg font-semibold text-stf-navy dark:text-white">{t(`nav.${pageTitleKey(pathname)}`)}</h1>
           </div>
@@ -180,7 +198,7 @@ export function AdminShell({
               title="Notifications à venir"
               className="flex h-10 w-10 shrink-0 cursor-not-allowed items-center justify-center rounded-full border border-slate-200 text-slate-300 dark:border-border-default dark:text-slate-600"
             >
-              🔔
+              <Bell className="h-5 w-5" strokeWidth={1.8} />
             </button>
             <div className="lg:hidden">
               <UserMenu

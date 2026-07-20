@@ -1,5 +1,6 @@
 "use client";
 
+import { LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -69,7 +70,7 @@ export function UserMenu({
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
-              <span className="text-base">👤</span>
+              <User className="h-4 w-4" strokeWidth={1.8} />
               {t("userMenu.monProfil")}
             </Link>
             <Link
@@ -78,7 +79,7 @@ export function UserMenu({
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-stf-navy dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
             >
-              <span className="text-base">⚙️</span>
+              <Settings className="h-4 w-4" strokeWidth={1.8} />
               {t("userMenu.parametres")}
             </Link>
             <form action={logoutAction}>
@@ -87,7 +88,7 @@ export function UserMenu({
                 role="menuitem"
                 className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium text-stf-red hover:bg-stf-red-light dark:hover:bg-stf-red/15"
               >
-                <span className="text-base">🚪</span>
+                <LogOut className="h-4 w-4" strokeWidth={1.8} />
                 {t("userMenu.deconnexion")}
               </button>
             </form>

@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
 export function Modal({
@@ -63,7 +64,7 @@ export function Modal({
             aria-label="Fermer"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-white/10 dark:hover:text-slate-300"
           >
-            ✕
+            <X className="h-4 w-4" strokeWidth={1.8} />
           </button>
         </div>
         <div className="mt-6">{children}</div>

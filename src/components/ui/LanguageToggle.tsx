@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, ChevronDown, Globe } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { Locale } from "@/lib/i18n/dictionaries";
@@ -50,26 +51,12 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
             : "border-slate-200 text-slate-600 hover:border-stf-orange hover:text-stf-orange dark:border-border-default dark:text-slate-300"
         }`}
       >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4 fill-none stroke-current"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18M12 3c2.4 2.5 3.7 5.6 3.7 9s-1.3 6.5-3.7 9c-2.4-2.5-3.7-5.6-3.7-9S9.6 5.5 12 3Z" />
-        </svg>
+        <Globe className="h-4 w-4" strokeWidth={1.8} />
         <span>{current.label}</span>
-        <svg
-          viewBox="0 0 24 24"
-          className={`h-3.5 w-3.5 fill-none stroke-current transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          strokeWidth={2}
+        />
       </button>
 
       {open ? (
@@ -107,17 +94,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
                   {option.label}
                 </span>
                 {option.name}
-                {selected ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="ml-auto h-4 w-4 fill-none stroke-current"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : null}
+                {selected ? <Check className="ml-auto h-4 w-4" strokeWidth={2} /> : null}
               </button>
             );
           })}
