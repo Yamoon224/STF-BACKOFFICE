@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const API_URL = process.env.API_URL ?? "https://stf.jss-gn.com/api";
 export const AUTH_COOKIE = "stf_admin_token";
@@ -52,6 +53,21 @@ export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptio
   const data = isJson ? await res.json().catch(() => null) : null;
 
   if (!res.ok) {
+    // A previously valid session token was rejected by the API (expired/revoked):
+    // clear it and send the user back to the login page instead of surfacing a crash.
+    if (res.status === 401 && !anonymous) {
+      try {
+        // Cookie mutation only succeeds when called from a Server Action / Route
+        // Handler; in a Server Component render (read-only cookies) this throws,
+        // which we ignore — the redirect below still fires either way.
+        const cookieStore = await cookies();
+        cookieStore.delete(AUTH_COOKIE);
+      } catch {
+        // ignore — read-only cookies() context (Server Component render)
+      }
+      redirect("/connexion");
+    }
+
     throw new ApiError(data?.message ?? `Erreur API (${res.status})`, res.status, data?.errors);
   }
 

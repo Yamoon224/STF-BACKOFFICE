@@ -1,9 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const cookiesMock = vi.fn();
+const redirectMock = vi.fn((url: string) => {
+  throw Object.assign(new Error(`NEXT_REDIRECT:${url}`), { digest: `NEXT_REDIRECT;${url}` });
+});
 
 vi.mock("next/headers", () => ({
   cookies: () => cookiesMock(),
+}));
+
+vi.mock("next/navigation", () => ({
+  redirect: (url: string) => redirectMock(url),
 }));
 
 function jsonResponse(body: unknown, status = 200) {
@@ -85,5 +92,29 @@ describe("apiFetch", () => {
       status: 500,
       message: "Erreur API (500)",
     });
+  });
+
+  it("clears the session cookie and redirects to /connexion on a 401 from an authenticated request", async () => {
+    const deleteMock = vi.fn();
+    cookiesMock.mockResolvedValue({ get: () => ({ value: "stale-token" }), delete: deleteMock });
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ message: "Unauthenticated." }, 401));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { apiFetch } = await import("./api");
+
+    await expect(apiFetch("/users")).rejects.toMatchObject({ message: "NEXT_REDIRECT:/connexion" });
+    expect(deleteMock).toHaveBeenCalledWith("stf_admin_token");
+    expect(redirectMock).toHaveBeenCalledWith("/connexion");
+  });
+
+  it("does not auto-redirect on a 401 from an anonymous request (e.g. bad login credentials)", async () => {
+    cookiesMock.mockResolvedValue({ get: () => undefined });
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ message: "Identifiants invalides." }, 401));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { apiFetch, ApiError } = await import("./api");
+
+    await expect(apiFetch("/auth/login", { anonymous: true })).rejects.toBeInstanceOf(ApiError);
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });
