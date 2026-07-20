@@ -178,3 +178,23 @@ export type ActivityByProgram = {
   mentees_count: number;
   sessions_count: number;
 };
+
+export type SiteSettings = Record<string, string | null>;
+
+export type PageSectionType =
+  | "hero"
+  | "text"
+  | "list_title_description"
+  | "list_role_mission"
+  | "list_title_text"
+  | "list_label_value"
+  | "list_text";
+
+export type PageSection = {
+  id: number;
+  page_key: string;
+  section_key: string;
+  type: PageSectionType;
+  payload: Record<string, unknown>;
+  order: number;
+};

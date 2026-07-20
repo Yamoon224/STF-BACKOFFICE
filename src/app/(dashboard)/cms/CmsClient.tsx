@@ -16,11 +16,13 @@ import {
   deleteTestimonialAction,
   updateCmsPageAction,
   updateFaqAction,
+  updatePageSectionAction,
   updatePartnerAction,
+  updateSiteSettingsAction,
   updateTestimonialAction,
 } from "@/lib/actions/admin";
 import { formatDate, statusLabel } from "@/lib/format";
-import type { CmsPage, Faq, Partner, Testimonial } from "@/lib/types";
+import type { CmsPage, Faq, PageSection, Partner, SiteSettings, Testimonial } from "@/lib/types";
 
 const contentTypes = [
   { label: "Page", value: "page" },
@@ -32,6 +34,8 @@ const tabs = [
   { key: "partners", label: "Partenaires" },
   { key: "testimonials", label: "Témoignages" },
   { key: "faqs", label: "FAQ" },
+  { key: "sections", label: "Sections du site" },
+  { key: "settings", label: "Paramètres" },
 ] as const;
 
 type TabKey = (typeof tabs)[number]["key"];
@@ -41,18 +45,23 @@ export function CmsClient({
   partners,
   testimonials,
   faqs,
+  siteSettings,
+  pageSections,
 }: {
   cmsPages: CmsPage[];
   partners: Partner[];
   testimonials: Testimonial[];
   faqs: Faq[];
+  siteSettings: SiteSettings;
+  pageSections: PageSection[];
 }) {
   const [tab, setTab] = useState<TabKey>("pages");
 
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500 dark:text-slate-400">
-        Gestion des pages et actualités du site public, ainsi que des partenaires, témoignages et FAQ.
+        Gestion des pages et actualités du site public, ainsi que des partenaires, témoignages, FAQ, sections de
+        contenu et paramètres.
       </p>
 
       <div className="flex flex-wrap gap-2">
@@ -75,6 +84,8 @@ export function CmsClient({
       {tab === "partners" ? <PartnersPanel partners={partners} /> : null}
       {tab === "testimonials" ? <TestimonialsPanel testimonials={testimonials} /> : null}
       {tab === "faqs" ? <FaqsPanel faqs={faqs} /> : null}
+      {tab === "sections" ? <PageSectionsPanel pageSections={pageSections} /> : null}
+      {tab === "settings" ? <SiteSettingsPanel siteSettings={siteSettings} /> : null}
     </div>
   );
 }
@@ -679,6 +690,373 @@ function FaqsPanel({ faqs }: { faqs: Faq[] }) {
           </form>
         ) : null}
       </Modal>
+    </div>
+  );
+}
+
+const settingsGroups: { title: string; fields: { key: string; label: string }[] }[] = [
+  {
+    title: "Contact",
+    fields: [
+      { key: "address", label: "Adresse / siège" },
+      { key: "phone", label: "Téléphone" },
+      { key: "email_primary", label: "Email principal" },
+      { key: "email_secondary", label: "Email secondaire" },
+      { key: "site_url", label: "Site web" },
+    ],
+  },
+  {
+    title: "Réseaux sociaux",
+    fields: [
+      { key: "social_linkedin", label: "LinkedIn" },
+      { key: "social_facebook", label: "Facebook" },
+      { key: "social_instagram", label: "Instagram" },
+      { key: "social_youtube", label: "YouTube" },
+      { key: "social_x", label: "X (Twitter)" },
+    ],
+  },
+];
+
+function SiteSettingsPanel({ siteSettings }: { siteSettings: SiteSettings }) {
+  const [pending, startTransition] = useTransition();
+  const [saved, setSaved] = useState(false);
+
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      await updateSiteSettingsAction(formData);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    });
+  }
+
+  return (
+    <Card>
+      <form action={handleSubmit} className="space-y-8">
+        {settingsGroups.map((group) => (
+          <div key={group.title}>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-stf-orange">{group.title}</h3>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              {group.fields.map((field) => (
+                <Field key={field.key} label={field.label}>
+                  <input
+                    name={field.key}
+                    defaultValue={siteSettings[field.key] ?? ""}
+                    className={fieldInputClass}
+                  />
+                </Field>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          {saved ? <span className="text-sm font-semibold text-stf-green">Enregistré</span> : null}
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+          >
+            {pending ? "Enregistrement…" : "Enregistrer"}
+          </button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+const pageLabels: Record<string, string> = {
+  "a-propos": "À propos",
+  politiques: "Politiques",
+  impact: "Impact",
+  mentorat: "Mentorat",
+  partenaires: "Partenaires",
+  programmes: "Programmes",
+  blog: "Blog",
+  "experiences-virtuelles": "Expériences virtuelles",
+  contact: "Contact",
+};
+
+const sectionLabels: Record<string, string> = {
+  hero: "En-tête",
+  histoire: "Notre histoire",
+  mission: "Notre mission",
+  values: "Valeurs",
+  governance: "Gouvernance",
+  policies: "Politiques",
+  indicators: "Indicateurs",
+  mentee_path: "Parcours mentée",
+  mentor_path: "Parcours mentore",
+  security: "Sécurité",
+  cta: "Appel à l'action",
+};
+
+function sectionSummary(section: PageSection): string {
+  const p = section.payload as Record<string, unknown>;
+  if (typeof p.title === "string") return p.title;
+  if (Array.isArray(p.items)) return `${p.items.length} élément(s)`;
+  return "—";
+}
+
+function PageSectionsPanel({ pageSections }: { pageSections: PageSection[] }) {
+  const [editing, setEditing] = useState<PageSection | null>(null);
+
+  const grouped = pageSections.reduce<Record<string, PageSection[]>>((acc, section) => {
+    (acc[section.page_key] ??= []).push(section);
+    return acc;
+  }, {});
+
+  return (
+    <div className="space-y-6">
+      {Object.entries(grouped).map(([pageKey, sections]) => (
+        <Card key={pageKey}>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-stf-orange">
+            {pageLabels[pageKey] ?? pageKey}
+          </h3>
+          <div className="mt-4 divide-y divide-slate-100 dark:divide-border-subtle">
+            {sections.map((section) => (
+              <div key={section.id} className="flex items-center justify-between gap-4 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-stf-navy dark:text-white">
+                    {sectionLabels[section.section_key] ?? section.section_key}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                    {sectionSummary(section)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditing(section)}
+                  className="shrink-0 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                >
+                  Modifier
+                </button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ))}
+
+      <Modal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        title={editing ? `${pageLabels[editing.page_key] ?? editing.page_key} — ${sectionLabels[editing.section_key] ?? editing.section_key}` : ""}
+        className="max-w-2xl"
+      >
+        {editing ? <SectionEditorForm section={editing} onDone={() => setEditing(null)} /> : null}
+      </Modal>
+    </div>
+  );
+}
+
+function SectionEditorForm({ section, onDone }: { section: PageSection; onDone: () => void }) {
+  const [payload, setPayload] = useState<Record<string, unknown>>(section.payload);
+  const [pending, startTransition] = useTransition();
+
+  function save() {
+    startTransition(async () => {
+      await updatePageSectionAction(section.id, payload);
+      onDone();
+    });
+  }
+
+  const listFieldsByType: Record<string, { key: string; label: string; multiline?: boolean }[]> = {
+    list_title_description: [
+      { key: "title", label: "Titre" },
+      { key: "description", label: "Description", multiline: true },
+    ],
+    list_role_mission: [
+      { key: "role", label: "Rôle" },
+      { key: "mission", label: "Mission", multiline: true },
+    ],
+    list_title_text: [
+      { key: "title", label: "Titre" },
+      { key: "text", label: "Texte", multiline: true },
+    ],
+    list_label_value: [
+      { key: "label", label: "Libellé" },
+      { key: "value", label: "Valeur" },
+    ],
+  };
+
+  return (
+    <div className="space-y-5">
+      {section.type === "hero" ? (
+        <>
+          <Field label="Eyebrow">
+            <input
+              defaultValue={(payload.eyebrow as string) ?? ""}
+              onChange={(e) => setPayload((p) => ({ ...p, eyebrow: e.target.value }))}
+              className={fieldInputClass}
+            />
+          </Field>
+          <Field label="Titre">
+            <input
+              defaultValue={(payload.title as string) ?? ""}
+              onChange={(e) => setPayload((p) => ({ ...p, title: e.target.value }))}
+              className={fieldInputClass}
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              rows={3}
+              defaultValue={(payload.description as string) ?? ""}
+              onChange={(e) => setPayload((p) => ({ ...p, description: e.target.value }))}
+              className={fieldInputClass}
+            />
+          </Field>
+        </>
+      ) : null}
+
+      {section.type === "text" ? (
+        <>
+          {"eyebrow" in payload ? (
+            <Field label="Eyebrow">
+              <input
+                defaultValue={(payload.eyebrow as string) ?? ""}
+                onChange={(e) => setPayload((p) => ({ ...p, eyebrow: e.target.value }))}
+                className={fieldInputClass}
+              />
+            </Field>
+          ) : null}
+          <Field label="Titre">
+            <input
+              defaultValue={(payload.title as string) ?? ""}
+              onChange={(e) => setPayload((p) => ({ ...p, title: e.target.value }))}
+              className={fieldInputClass}
+            />
+          </Field>
+          <Field label="Texte">
+            <textarea
+              rows={4}
+              defaultValue={(payload.body as string) ?? ""}
+              onChange={(e) => setPayload((p) => ({ ...p, body: e.target.value }))}
+              className={fieldInputClass}
+            />
+          </Field>
+        </>
+      ) : null}
+
+      {section.type === "list_text" ? (
+        <StringListEditor
+          items={(payload.items as string[]) ?? []}
+          onChange={(items) => setPayload((p) => ({ ...p, items }))}
+        />
+      ) : null}
+
+      {listFieldsByType[section.type] ? (
+        <ObjectListEditor
+          items={(payload.items as Record<string, string>[]) ?? []}
+          fields={listFieldsByType[section.type]}
+          onChange={(items) => setPayload((p) => ({ ...p, items }))}
+        />
+      ) : null}
+
+      <div className="flex justify-end gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onDone}
+          className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          onClick={save}
+          disabled={pending}
+          className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+        >
+          {pending ? "Enregistrement…" : "Enregistrer"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StringListEditor({ items, onChange }: { items: string[]; onChange: (items: string[]) => void }) {
+  return (
+    <div className="space-y-3">
+      <label className="text-sm font-semibold text-stf-navy dark:text-white">Éléments</label>
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-2">
+          <textarea
+            rows={2}
+            value={item}
+            onChange={(e) => onChange(items.map((it, idx) => (idx === i ? e.target.value : it)))}
+            className={fieldInputClass + " mt-0"}
+          />
+          <button
+            type="button"
+            onClick={() => onChange(items.filter((_, idx) => idx !== i))}
+            className="shrink-0 text-xs font-semibold text-stf-red hover:text-stf-orange"
+          >
+            Retirer
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...items, ""])}
+        className="text-xs font-semibold text-stf-blue hover:text-stf-orange"
+      >
+        + Ajouter un élément
+      </button>
+    </div>
+  );
+}
+
+function ObjectListEditor({
+  items,
+  fields,
+  onChange,
+}: {
+  items: Record<string, string>[];
+  fields: { key: string; label: string; multiline?: boolean }[];
+  onChange: (items: Record<string, string>[]) => void;
+}) {
+  function updateItem(index: number, key: string, value: string) {
+    onChange(items.map((item, idx) => (idx === index ? { ...item, [key]: value } : item)));
+  }
+
+  return (
+    <div className="space-y-4">
+      <label className="text-sm font-semibold text-stf-navy dark:text-white">Éléments</label>
+      {items.map((item, i) => (
+        <div key={i} className="space-y-2 rounded-xl border border-slate-100 p-4 dark:border-border-subtle">
+          {fields.map((field) =>
+            field.multiline ? (
+              <textarea
+                key={field.key}
+                rows={2}
+                placeholder={field.label}
+                value={item[field.key] ?? ""}
+                onChange={(e) => updateItem(i, field.key, e.target.value)}
+                className={fieldInputClass + " mt-0"}
+              />
+            ) : (
+              <input
+                key={field.key}
+                placeholder={field.label}
+                value={item[field.key] ?? ""}
+                onChange={(e) => updateItem(i, field.key, e.target.value)}
+                className={fieldInputClass + " mt-0"}
+              />
+            )
+          )}
+          <button
+            type="button"
+            onClick={() => onChange(items.filter((_, idx) => idx !== i))}
+            className="text-xs font-semibold text-stf-red hover:text-stf-orange"
+          >
+            Retirer cet élément
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...items, Object.fromEntries(fields.map((f) => [f.key, ""]))])}
+        className="text-xs font-semibold text-stf-blue hover:text-stf-orange"
+      >
+        + Ajouter un élément
+      </button>
     </div>
   );
 }

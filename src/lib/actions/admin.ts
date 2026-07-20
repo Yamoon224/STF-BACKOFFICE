@@ -354,6 +354,20 @@ export async function deleteFaqAction(faqId: number): Promise<void> {
   revalidatePath("/cms");
 }
 
+export async function updateSiteSettingsAction(formData: FormData): Promise<void> {
+  const body: Record<string, string> = {};
+  for (const [key, value] of formData.entries()) {
+    body[key] = String(value);
+  }
+  await apiFetch("/site-settings", { method: "PATCH", body });
+  revalidatePath("/cms");
+}
+
+export async function updatePageSectionAction(sectionId: number, payload: Record<string, unknown>): Promise<void> {
+  await apiFetch(`/page-sections/${sectionId}`, { method: "PATCH", body: { payload } });
+  revalidatePath("/cms");
+}
+
 export async function updateReportStatusAction(reportId: number, status: "en_cours" | "resolu"): Promise<void> {
   await apiFetch(`/reports/${reportId}`, { method: "PATCH", body: { status } });
   revalidatePath("/signalements");
