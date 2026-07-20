@@ -34,6 +34,9 @@ export const dictionaries = {
       deconnexion: "Se déconnecter",
     },
     connexion: {
+      panelTitle: "Console d'administration",
+      panelDescription:
+        "Pilotez les utilisatrices, le mentorat, le contenu et la sécurité de la plateforme STF.",
       title: "Connexion sécurisée",
       description: "Réservé aux collaboratrices et à l'administratrice STF.",
       email: "Email professionnel",
@@ -78,6 +81,8 @@ export const dictionaries = {
       deconnexion: "Sign out",
     },
     connexion: {
+      panelTitle: "Admin console",
+      panelDescription: "Manage users, mentorship, content and security across the STF platform.",
       title: "Secure sign in",
       description: "Reserved for STF staff and the administrator.",
       email: "Work email",
