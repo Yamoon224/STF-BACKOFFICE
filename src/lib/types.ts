@@ -135,6 +135,21 @@ export type Partner = {
   type: "confiance" | "partenaire";
 };
 
+export type Scholarship = {
+  id: number;
+  title: string;
+  provider: string | null;
+  description: string | null;
+  amount: string | null;
+  audience: string | null;
+  deadline: string | null;
+  application_url: string | null;
+  image_path: string | null;
+  image_url: string | null;
+  status: "ouverte" | "fermee" | "a_venir";
+  order: number;
+};
+
 export type Testimonial = {
   id: number;
   name: string;

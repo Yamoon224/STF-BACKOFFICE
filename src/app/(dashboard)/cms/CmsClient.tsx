@@ -12,21 +12,24 @@ import {
   createCmsPageAction,
   createFaqAction,
   createPartnerAction,
+  createScholarshipAction,
   createTestimonialAction,
   deleteCmsPageAction,
   deleteCmsPageImageAction,
   deleteFaqAction,
   deletePartnerAction,
+  deleteScholarshipAction,
   deleteTestimonialAction,
   updateCmsPageAction,
   updateFaqAction,
   updatePageSectionAction,
   updatePartnerAction,
+  updateScholarshipAction,
   updateSiteSettingsAction,
   updateTestimonialAction,
 } from "@/lib/actions/admin";
 import { formatDate, statusLabel } from "@/lib/format";
-import type { CmsPage, Faq, PageSection, Partner, SiteSettings, Testimonial } from "@/lib/types";
+import type { CmsPage, Faq, PageSection, Partner, Scholarship, SiteSettings, Testimonial } from "@/lib/types";
 
 const contentTypes = [
   { label: "Page", value: "page" },
@@ -42,9 +45,26 @@ function partnerTypeLabel(type: Partner["type"]): string {
   return partnerTypes.find((t) => t.value === type)?.label ?? type;
 }
 
+const scholarshipStatuses = [
+  { label: "Candidatures ouvertes", value: "ouverte" },
+  { label: "À venir", value: "a_venir" },
+  { label: "Clôturée", value: "fermee" },
+];
+
+function scholarshipStatusLabel(status: Scholarship["status"]): string {
+  return scholarshipStatuses.find((s) => s.value === status)?.label ?? status;
+}
+
+function scholarshipStatusTone(status: Scholarship["status"]): "green" | "orange" | "neutral" {
+  if (status === "ouverte") return "green";
+  if (status === "a_venir") return "orange";
+  return "neutral";
+}
+
 const tabs = [
   { key: "pages", label: "Pages" },
   { key: "partners", label: "Partenaires" },
+  { key: "scholarships", label: "Bourses" },
   { key: "testimonials", label: "Témoignages" },
   { key: "faqs", label: "FAQ" },
   { key: "sections", label: "Sections du site" },
@@ -56,6 +76,7 @@ type TabKey = (typeof tabs)[number]["key"];
 export function CmsClient({
   cmsPages,
   partners,
+  scholarships,
   testimonials,
   faqs,
   siteSettings,
@@ -63,6 +84,7 @@ export function CmsClient({
 }: {
   cmsPages: CmsPage[];
   partners: Partner[];
+  scholarships: Scholarship[];
   testimonials: Testimonial[];
   faqs: Faq[];
   siteSettings: SiteSettings;
@@ -95,6 +117,7 @@ export function CmsClient({
 
       {tab === "pages" ? <PagesPanel cmsPages={cmsPages} /> : null}
       {tab === "partners" ? <PartnersPanel partners={partners} /> : null}
+      {tab === "scholarships" ? <ScholarshipsPanel scholarships={scholarships} /> : null}
       {tab === "testimonials" ? <TestimonialsPanel testimonials={testimonials} /> : null}
       {tab === "faqs" ? <FaqsPanel faqs={faqs} /> : null}
       {tab === "sections" ? <PageSectionsPanel pageSections={pageSections} /> : null}
@@ -578,6 +601,267 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
   );
 }
 
+function ScholarshipsPanel({ scholarships }: { scholarships: Scholarship[] }) {
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Scholarship | null>(null);
+  const [pending, startTransition] = useTransition();
+  const { pageItems, page, setPage, totalPages, total, pageSize } = usePagination(scholarships);
+
+  function handleCreate(formData: FormData) {
+    startTransition(async () => {
+      await createScholarshipAction(formData);
+      setOpen(false);
+    });
+  }
+
+  function handleUpdate(formData: FormData) {
+    if (!editing) return;
+    startTransition(async () => {
+      await updateScholarshipAction(editing.id, formData);
+      setEditing(null);
+    });
+  }
+
+  function handleDelete(id: number) {
+    if (!confirm("Supprimer cette bourse ?")) return;
+    startTransition(async () => {
+      await deleteScholarshipAction(id);
+    });
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90"
+        >
+          <PlusIcon className="h-4 w-4" />
+          Ajouter une bourse
+        </button>
+      </div>
+
+      <Card>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
+                <th className="py-3">Image</th>
+                <th className="py-3">Titre</th>
+                <th className="py-3">Organisme</th>
+                <th className="py-3">Échéance</th>
+                <th className="py-3">Statut</th>
+                <th className="py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
+              {pageItems.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                    Aucune bourse pour le moment.
+                  </td>
+                </tr>
+              ) : (
+                pageItems.map((s) => (
+                  <tr key={s.id}>
+                    <td className="py-4">
+                      {s.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={s.image_url}
+                          alt={s.title}
+                          className="h-10 w-14 rounded-lg border border-slate-100 object-cover dark:border-border-default"
+                        />
+                      ) : (
+                        <span className="flex h-10 w-14 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
+                          —
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 font-medium text-stf-navy dark:text-white">{s.title}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{s.provider ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{formatDate(s.deadline)}</td>
+                    <td className="py-4">
+                      <Badge tone={scholarshipStatusTone(s.status)}>{scholarshipStatusLabel(s.status)}</Badge>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setEditing(s)}
+                          className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-stf-orange dark:text-slate-300"
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(s.id)}
+                          className="flex items-center gap-1 text-xs font-semibold text-stf-red hover:text-stf-orange"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                          Supprimer
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <Pagination page={page} totalPages={totalPages} total={total} pageSize={pageSize} onChange={setPage} />
+      </Card>
+
+      <Modal open={open} onClose={() => setOpen(false)} title="Ajouter une bourse">
+        <form action={handleCreate} className="space-y-5">
+          <Field label="Titre">
+            <input required name="title" placeholder="Ex. Bourse d'excellence STF" className={fieldInputClass} />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Organisme">
+              <input name="provider" className={fieldInputClass} />
+            </Field>
+            <Field label="Statut">
+              <select name="status" defaultValue="ouverte" className={fieldInputClass}>
+                {scholarshipStatuses.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <Field label="Description">
+            <textarea name="description" rows={3} className={fieldInputClass} />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Montant">
+              <input name="amount" placeholder="Ex. 500 000 FCFA" className={fieldInputClass} />
+            </Field>
+            <Field label="Public visé">
+              <input name="audience" placeholder="Ex. Licence · Master" className={fieldInputClass} />
+            </Field>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Échéance de candidature">
+              <input type="date" name="deadline" className={fieldInputClass} />
+            </Field>
+            <Field label="Lien de candidature">
+              <input name="application_url" type="url" placeholder="https://" className={fieldInputClass} />
+            </Field>
+          </div>
+          <Field label="Image (optionnelle)">
+            <input name="image" type="file" accept="image/*" className={fieldInputClass} />
+          </Field>
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={pending}
+              className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+            >
+              Ajouter
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={editing !== null} onClose={() => setEditing(null)} title="Modifier la bourse">
+        {editing ? (
+          <form action={handleUpdate} className="space-y-5">
+            <Field label="Titre">
+              <input required name="title" defaultValue={editing.title} className={fieldInputClass} />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Organisme">
+                <input name="provider" defaultValue={editing.provider ?? ""} className={fieldInputClass} />
+              </Field>
+              <Field label="Statut">
+                <select name="status" defaultValue={editing.status} className={fieldInputClass}>
+                  {scholarshipStatuses.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            <Field label="Description">
+              <textarea name="description" defaultValue={editing.description ?? ""} rows={3} className={fieldInputClass} />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Montant">
+                <input name="amount" defaultValue={editing.amount ?? ""} className={fieldInputClass} />
+              </Field>
+              <Field label="Public visé">
+                <input name="audience" defaultValue={editing.audience ?? ""} className={fieldInputClass} />
+              </Field>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Échéance de candidature">
+                <input
+                  type="date"
+                  name="deadline"
+                  defaultValue={editing.deadline ? editing.deadline.slice(0, 10) : ""}
+                  className={fieldInputClass}
+                />
+              </Field>
+              <Field label="Lien de candidature">
+                <input
+                  name="application_url"
+                  type="url"
+                  defaultValue={editing.application_url ?? ""}
+                  className={fieldInputClass}
+                />
+              </Field>
+            </div>
+            <Field label="Image (optionnelle)">
+              <div className="space-y-2">
+                {editing.image_url ? (
+                  <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={editing.image_url}
+                      alt={editing.title}
+                      className="h-16 w-24 rounded-lg border border-slate-100 object-cover dark:border-border-default"
+                    />
+                    <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <input type="checkbox" name="remove_image" className="rounded border-slate-300" />
+                      Retirer l&apos;image actuelle
+                    </label>
+                  </div>
+                ) : null}
+                <input name="image" type="file" accept="image/*" className={fieldInputClass} />
+              </div>
+            </Field>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 dark:border-border-default dark:text-slate-300 dark:hover:bg-white/5"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={pending}
+                className="rounded-full bg-stf-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-stf-orange/90 disabled:opacity-50"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        ) : null}
+      </Modal>
+    </div>
+  );
+}
+
 function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Testimonial | null>(null);
@@ -940,6 +1224,7 @@ const pageLabels: Record<string, string> = {
   mentorat: "Mentorat",
   partenaires: "Partenaires",
   programmes: "Programmes",
+  bourses: "Bourses",
   blog: "Blog",
   "experiences-virtuelles": "Expériences virtuelles",
   contact: "Contact",

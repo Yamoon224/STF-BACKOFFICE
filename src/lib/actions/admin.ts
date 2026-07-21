@@ -341,6 +341,54 @@ export async function deletePartnerAction(partnerId: number): Promise<void> {
   revalidatePath("/cms");
 }
 
+export async function createScholarshipAction(formData: FormData): Promise<void> {
+  const payload = new FormData();
+  payload.set("title", String(formData.get("title") ?? ""));
+  payload.set("provider", String(formData.get("provider") ?? ""));
+  payload.set("description", String(formData.get("description") ?? ""));
+  payload.set("amount", String(formData.get("amount") ?? ""));
+  payload.set("audience", String(formData.get("audience") ?? ""));
+  payload.set("deadline", String(formData.get("deadline") ?? ""));
+  payload.set("application_url", String(formData.get("application_url") ?? ""));
+  payload.set("status", String(formData.get("status") ?? "ouverte"));
+
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    payload.set("image", image);
+  }
+
+  await apiFetch("/scholarships", { method: "POST", body: payload });
+  revalidatePath("/cms");
+}
+
+export async function updateScholarshipAction(scholarshipId: number, formData: FormData): Promise<void> {
+  const payload = new FormData();
+  payload.set("_method", "PATCH");
+  payload.set("title", String(formData.get("title") ?? ""));
+  payload.set("provider", String(formData.get("provider") ?? ""));
+  payload.set("description", String(formData.get("description") ?? ""));
+  payload.set("amount", String(formData.get("amount") ?? ""));
+  payload.set("audience", String(formData.get("audience") ?? ""));
+  payload.set("deadline", String(formData.get("deadline") ?? ""));
+  payload.set("application_url", String(formData.get("application_url") ?? ""));
+  payload.set("status", String(formData.get("status") ?? "ouverte"));
+
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    payload.set("image", image);
+  } else if (formData.get("remove_image")) {
+    payload.set("remove_image", "1");
+  }
+
+  await apiFetch(`/scholarships/${scholarshipId}`, { method: "POST", body: payload });
+  revalidatePath("/cms");
+}
+
+export async function deleteScholarshipAction(scholarshipId: number): Promise<void> {
+  await apiFetch(`/scholarships/${scholarshipId}`, { method: "DELETE" });
+  revalidatePath("/cms");
+}
+
 export async function createTestimonialAction(formData: FormData): Promise<void> {
   await apiFetch("/testimonials", {
     method: "POST",
