@@ -308,9 +308,11 @@ describe("createCmsPageAction", () => {
 
     await createCmsPageAction(formData({ title: "Article" }));
 
-    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages", {
-      method: "POST",
-      body: { title: "Article", type: "page", status: "brouillon" },
+    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({
+      title: "Article",
+      type: "page",
+      status: "brouillon",
     });
   });
 
@@ -319,9 +321,11 @@ describe("createCmsPageAction", () => {
 
     await createCmsPageAction(formData({ title: "Article", type: "article", publish: "on" }));
 
-    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages", {
-      method: "POST",
-      body: { title: "Article", type: "article", status: "publie" },
+    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({
+      title: "Article",
+      type: "article",
+      status: "publie",
     });
   });
 });
@@ -332,9 +336,14 @@ describe("cms page management actions", () => {
 
     await updateCmsPageAction(3, formData({ title: "Titre modifié" }));
 
-    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages/3", {
-      method: "PATCH",
-      body: { title: "Titre modifié", body: null, excerpt: null, category: null, status: "brouillon" },
+    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages/3", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({
+      _method: "PATCH",
+      title: "Titre modifié",
+      body: "",
+      excerpt: "",
+      category: "",
+      status: "brouillon",
     });
     expect(revalidatePathMock).toHaveBeenCalledWith("/cms");
   });
@@ -354,7 +363,11 @@ describe("partner actions", () => {
 
     await createPartnerAction(formData({ name: "ACME", url: "https://acme.org" }));
     expect(apiFetchMock).toHaveBeenCalledWith("/partners", expect.objectContaining({ method: "POST" }));
-    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({ name: "ACME", url: "https://acme.org" });
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({
+      name: "ACME",
+      url: "https://acme.org",
+      type: "confiance",
+    });
 
     await updatePartnerAction(1, formData({ name: "ACME Corp" }));
     expect(apiFetchMock).toHaveBeenCalledWith("/partners/1", expect.objectContaining({ method: "POST" }));
@@ -362,6 +375,7 @@ describe("partner actions", () => {
       _method: "PATCH",
       name: "ACME Corp",
       url: "",
+      type: "confiance",
     });
 
     await deletePartnerAction(1);
