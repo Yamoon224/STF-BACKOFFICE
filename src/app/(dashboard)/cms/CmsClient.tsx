@@ -8,11 +8,13 @@ import { Field, fieldInputClass } from "@/components/ui/FormField";
 import { Pagination, usePagination } from "@/components/ui/Pagination";
 import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
 import {
+  addCmsPageImagesAction,
   createCmsPageAction,
   createFaqAction,
   createPartnerAction,
   createTestimonialAction,
   deleteCmsPageAction,
+  deleteCmsPageImageAction,
   deleteFaqAction,
   deletePartnerAction,
   deleteTestimonialAction,
@@ -258,7 +260,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
             <Field label="Catégorie">
               <input name="category" defaultValue={editing.category ?? ""} className={fieldInputClass} />
             </Field>
-            <Field label="Image (optionnelle)">
+            <Field label="Image de couverture (optionnelle)">
               <div className="space-y-2">
                 {editing.image_url ? (
                   <div className="flex items-center gap-3">
@@ -299,7 +301,72 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
             </div>
           </form>
         ) : null}
+        {editing ? <GalleryEditor key={editing.id} page={editing} /> : null}
       </Modal>
+    </div>
+  );
+}
+
+function GalleryEditor({ page }: { page: CmsPage }) {
+  const [images, setImages] = useState(page.images ?? []);
+  const [pending, startTransition] = useTransition();
+
+  function handleAdd(formData: FormData) {
+    startTransition(async () => {
+      const created = await addCmsPageImagesAction(page.id, formData);
+      setImages((prev) => [...prev, ...created]);
+    });
+  }
+
+  function handleRemove(imageId: number) {
+    if (!confirm("Retirer cette image de la galerie ?")) return;
+    startTransition(async () => {
+      await deleteCmsPageImageAction(imageId);
+      setImages((prev) => prev.filter((img) => img.id !== imageId));
+    });
+  }
+
+  return (
+    <div className="mt-6 border-t border-slate-100 pt-5 dark:border-border-subtle">
+      <p className="text-sm font-semibold text-stf-navy dark:text-white">
+        Galerie photos <span className="font-normal text-slate-400">— activité / événement</span>
+      </p>
+      {images.length > 0 ? (
+        <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
+          {images.map((img) => (
+            <div key={img.id} className="group relative">
+              {img.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={img.image_url}
+                  alt=""
+                  className="h-20 w-full rounded-lg border border-slate-100 object-cover dark:border-border-default"
+                />
+              ) : null}
+              <button
+                type="button"
+                onClick={() => handleRemove(img.id)}
+                disabled={pending}
+                className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
+              >
+                Retirer
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">Aucune image dans la galerie pour le moment.</p>
+      )}
+      <form action={handleAdd} className="mt-3 flex flex-wrap items-center gap-3">
+        <input name="images" type="file" accept="image/*" multiple className={fieldInputClass + " max-w-xs"} />
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-full border border-stf-blue px-4 py-2 text-xs font-semibold text-stf-blue hover:bg-stf-blue/5 disabled:opacity-50"
+        >
+          + Ajouter à la galerie
+        </button>
+      </form>
     </div>
   );
 }

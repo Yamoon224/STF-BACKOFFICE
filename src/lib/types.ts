@@ -102,6 +102,14 @@ export type GroupDetail = Group & {
   members: GroupMember[];
 };
 
+export type CmsPageImage = {
+  id: number;
+  cms_page_id: number;
+  image_path: string;
+  image_url: string | null;
+  order: number;
+};
+
 export type CmsPage = {
   id: number;
   title: string;
@@ -113,6 +121,7 @@ export type CmsPage = {
   excerpt?: string | null;
   image_path?: string | null;
   image_url?: string | null;
+  images?: CmsPageImage[];
   updated_at: string;
 };
 

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError, apiFetch } from "@/lib/api";
+import type { CmsPageImage } from "@/lib/types";
 
 export async function inviteUserAction(formData: FormData): Promise<void> {
   await apiFetch("/users", {
@@ -278,6 +279,27 @@ export async function updateCmsPageAction(pageId: number, formData: FormData): P
 
 export async function deleteCmsPageAction(pageId: number): Promise<void> {
   await apiFetch(`/cms/pages/${pageId}`, { method: "DELETE" });
+  revalidatePath("/cms");
+}
+
+export async function addCmsPageImagesAction(pageId: number, formData: FormData): Promise<CmsPageImage[]> {
+  const payload = new FormData();
+  for (const file of formData.getAll("images")) {
+    if (file instanceof File && file.size > 0) {
+      payload.append("images[]", file);
+    }
+  }
+
+  const created = await apiFetch<CmsPageImage[]>(`/cms/pages/${pageId}/images`, {
+    method: "POST",
+    body: payload,
+  });
+  revalidatePath("/cms");
+  return created;
+}
+
+export async function deleteCmsPageImageAction(imageId: number): Promise<void> {
+  await apiFetch(`/cms/page-images/${imageId}`, { method: "DELETE" });
   revalidatePath("/cms");
 }
 
