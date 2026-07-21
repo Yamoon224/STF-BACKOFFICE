@@ -111,6 +111,8 @@ export type CmsPage = {
   category: string | null;
   body?: string | null;
   excerpt?: string | null;
+  image_path?: string | null;
+  image_url?: string | null;
   updated_at: string;
 };
 

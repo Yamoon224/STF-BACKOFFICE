@@ -146,6 +146,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
+                <th className="py-3">Image</th>
                 <th className="py-3">Titre</th>
                 <th className="py-3">Type</th>
                 <th className="py-3">Mis à jour</th>
@@ -156,6 +157,20 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {pageItems.map((c) => (
                 <tr key={c.id}>
+                  <td className="py-4">
+                    {c.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={c.image_url}
+                        alt={c.title}
+                        className="h-10 w-14 rounded-lg border border-slate-100 object-cover dark:border-border-default"
+                      />
+                    ) : (
+                      <span className="flex h-10 w-14 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
+                        —
+                      </span>
+                    )}
+                  </td>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{c.title}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{statusLabel(c.type)}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{formatDate(c.updated_at)}</td>
@@ -202,6 +217,9 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
               ))}
             </select>
           </Field>
+          <Field label="Image (optionnelle)">
+            <input name="image" type="file" accept="image/*" className={fieldInputClass} />
+          </Field>
           <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <input type="checkbox" name="publish" className="rounded border-slate-300" />
             Publier immédiatement (sinon enregistré comme brouillon)
@@ -239,6 +257,25 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
             </Field>
             <Field label="Catégorie">
               <input name="category" defaultValue={editing.category ?? ""} className={fieldInputClass} />
+            </Field>
+            <Field label="Image (optionnelle)">
+              <div className="space-y-2">
+                {editing.image_url ? (
+                  <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={editing.image_url}
+                      alt={editing.title}
+                      className="h-16 w-24 rounded-lg border border-slate-100 object-cover dark:border-border-default"
+                    />
+                    <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <input type="checkbox" name="remove_image" className="rounded border-slate-300" />
+                      Retirer l&apos;image actuelle
+                    </label>
+                  </div>
+                ) : null}
+                <input name="image" type="file" accept="image/*" className={fieldInputClass} />
+              </div>
             </Field>
             <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
               <input type="checkbox" name="publish" defaultChecked={editing.status === "publie"} className="rounded border-slate-300" />

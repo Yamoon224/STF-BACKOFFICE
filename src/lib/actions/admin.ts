@@ -242,28 +242,37 @@ export async function removeGroupMemberAction(groupId: number, userId: number): 
 }
 
 export async function createCmsPageAction(formData: FormData): Promise<void> {
-  await apiFetch("/cms/pages", {
-    method: "POST",
-    body: {
-      title: String(formData.get("title") ?? ""),
-      type: String(formData.get("type") ?? "page"),
-      status: formData.get("publish") ? "publie" : "brouillon",
-    },
-  });
+  const payload = new FormData();
+  payload.set("title", String(formData.get("title") ?? ""));
+  payload.set("type", String(formData.get("type") ?? "page"));
+  payload.set("status", formData.get("publish") ? "publie" : "brouillon");
+
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    payload.set("image", image);
+  }
+
+  await apiFetch("/cms/pages", { method: "POST", body: payload });
   revalidatePath("/cms");
 }
 
 export async function updateCmsPageAction(pageId: number, formData: FormData): Promise<void> {
-  await apiFetch(`/cms/pages/${pageId}`, {
-    method: "PATCH",
-    body: {
-      title: String(formData.get("title") ?? ""),
-      body: String(formData.get("body") ?? "") || null,
-      excerpt: String(formData.get("excerpt") ?? "") || null,
-      category: String(formData.get("category") ?? "") || null,
-      status: formData.get("publish") ? "publie" : "brouillon",
-    },
-  });
+  const payload = new FormData();
+  payload.set("_method", "PATCH");
+  payload.set("title", String(formData.get("title") ?? ""));
+  payload.set("body", String(formData.get("body") ?? ""));
+  payload.set("excerpt", String(formData.get("excerpt") ?? ""));
+  payload.set("category", String(formData.get("category") ?? ""));
+  payload.set("status", formData.get("publish") ? "publie" : "brouillon");
+
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    payload.set("image", image);
+  } else if (formData.get("remove_image")) {
+    payload.set("remove_image", "1");
+  }
+
+  await apiFetch(`/cms/pages/${pageId}`, { method: "POST", body: payload });
   revalidatePath("/cms");
 }
 
