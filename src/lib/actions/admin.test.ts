@@ -355,6 +355,34 @@ describe("cms page management actions", () => {
 
     expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages/3", { method: "DELETE" });
   });
+
+  it("uploads multiple images to a page's gallery", async () => {
+    const { addCmsPageImagesAction } = await import("./admin");
+
+    const img1 = new File(["a"], "a.png", { type: "image/png" });
+    const img2 = new File(["b"], "b.png", { type: "image/png" });
+    const fd = new FormData();
+    fd.append("images", img1);
+    fd.append("images", img2);
+
+    apiFetchMock.mockResolvedValueOnce([{ id: 1, image_url: "x" }]);
+    const result = await addCmsPageImagesAction(3, fd);
+
+    expect(apiFetchMock).toHaveBeenCalledWith("/cms/pages/3/images", expect.objectContaining({ method: "POST" }));
+    const body = apiFetchMock.mock.calls[0][1].body as FormData;
+    expect(body.getAll("images[]")).toEqual([img1, img2]);
+    expect(revalidatePathMock).toHaveBeenCalledWith("/cms");
+    expect(result).toEqual([{ id: 1, image_url: "x" }]);
+  });
+
+  it("deletes a gallery image", async () => {
+    const { deleteCmsPageImageAction } = await import("./admin");
+
+    await deleteCmsPageImageAction(7);
+
+    expect(apiFetchMock).toHaveBeenCalledWith("/cms/page-images/7", { method: "DELETE" });
+    expect(revalidatePathMock).toHaveBeenCalledWith("/cms");
+  });
 });
 
 describe("partner actions", () => {
@@ -397,6 +425,59 @@ describe("partner actions", () => {
     const updated = fdEntries(apiFetchMock.mock.calls[1][1].body);
     expect(updated.remove_logo).toBe("1");
     expect(updated.logo).toBeUndefined();
+  });
+});
+
+describe("scholarship actions", () => {
+  it("creates, updates and deletes a scholarship", async () => {
+    const { createScholarshipAction, updateScholarshipAction, deleteScholarshipAction } = await import("./admin");
+
+    await createScholarshipAction(formData({ title: "Bourse STF", provider: "UNESCO" }));
+    expect(apiFetchMock).toHaveBeenCalledWith("/scholarships", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[0][1].body)).toEqual({
+      title: "Bourse STF",
+      provider: "UNESCO",
+      description: "",
+      amount: "",
+      audience: "",
+      deadline: "",
+      application_url: "",
+      status: "ouverte",
+    });
+
+    await updateScholarshipAction(1, formData({ title: "Bourse STF 2", status: "fermee" }));
+    expect(apiFetchMock).toHaveBeenCalledWith("/scholarships/1", expect.objectContaining({ method: "POST" }));
+    expect(fdEntries(apiFetchMock.mock.calls[1][1].body)).toEqual({
+      _method: "PATCH",
+      title: "Bourse STF 2",
+      provider: "",
+      description: "",
+      amount: "",
+      audience: "",
+      deadline: "",
+      application_url: "",
+      status: "fermee",
+    });
+
+    await deleteScholarshipAction(1);
+    expect(apiFetchMock).toHaveBeenCalledWith("/scholarships/1", { method: "DELETE" });
+  });
+
+  it("uploads an image file when provided, and forwards remove_image otherwise", async () => {
+    const { createScholarshipAction, updateScholarshipAction } = await import("./admin");
+
+    const image = new File(["fake-image-bytes"], "bourse.png", { type: "image/png" });
+    const withImage = formData({ title: "Bourse STF" });
+    withImage.set("image", image);
+    await createScholarshipAction(withImage);
+    const created = fdEntries(apiFetchMock.mock.calls[0][1].body);
+    expect(created.image).toBe(image);
+
+    const removing = formData({ title: "Bourse STF", remove_image: "on" });
+    await updateScholarshipAction(1, removing);
+    const updated = fdEntries(apiFetchMock.mock.calls[1][1].body);
+    expect(updated.remove_image).toBe("1");
+    expect(updated.image).toBeUndefined();
   });
 });
 
