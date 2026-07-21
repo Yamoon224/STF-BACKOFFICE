@@ -13,7 +13,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-border-default dark:bg-surface ${className}`}
+      className={`min-w-0 rounded-2xl border border-slate-200 bg-white p-7 shadow-sm dark:border-border-default dark:bg-surface ${className}`}
     >
       {title ? (
         <div className="mb-5 flex items-center justify-between">

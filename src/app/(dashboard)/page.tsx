@@ -36,14 +36,14 @@ export default async function DashboardPage() {
   const severityTone = { high: "red", medium: "orange", low: "neutral" } as const;
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-10">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi) => (
           <StatCard key={kpi.label} label={kpi.label} value={kpi.value} />
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         <Card
           title="Activité par programme"
           className="lg:col-span-2"
