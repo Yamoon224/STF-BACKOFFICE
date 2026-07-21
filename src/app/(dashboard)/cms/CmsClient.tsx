@@ -31,6 +31,15 @@ const contentTypes = [
   { label: "Article", value: "article" },
 ];
 
+const partnerTypes = [
+  { label: "Ils nous font confiance", value: "confiance" },
+  { label: "Partenaires", value: "partenaire" },
+];
+
+function partnerTypeLabel(type: Partner["type"]): string {
+  return partnerTypes.find((t) => t.value === type)?.label ?? type;
+}
+
 const tabs = [
   { key: "pages", label: "Pages" },
   { key: "partners", label: "Partenaires" },
@@ -305,6 +314,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
               <tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400 dark:border-border-subtle dark:text-slate-500">
                 <th className="py-3">Logo</th>
                 <th className="py-3">Nom</th>
+                <th className="py-3">Type</th>
                 <th className="py-3">Site web</th>
                 <th className="py-3">Actions</th>
               </tr>
@@ -312,7 +322,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
             <tbody className="divide-y divide-slate-100 dark:divide-border-subtle">
               {pageItems.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
+                  <td colSpan={5} className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                     Aucun partenaire pour le moment.
                   </td>
                 </tr>
@@ -334,6 +344,9 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
                       )}
                     </td>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{p.name}</td>
+                    <td className="py-4">
+                      <Badge tone={p.type === "confiance" ? "orange" : "neutral"}>{partnerTypeLabel(p.type)}</Badge>
+                    </td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{p.url ?? "—"}</td>
                     <td className="py-4">
                       <div className="flex gap-3">
@@ -367,6 +380,15 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
           <Field label="Nom">
             <input required name="name" className={fieldInputClass} />
           </Field>
+          <Field label="Type">
+            <select name="type" defaultValue="confiance" className={fieldInputClass}>
+              {partnerTypes.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </Field>
           <Field label="Site web">
             <input name="url" type="url" placeholder="https://" className={fieldInputClass} />
           </Field>
@@ -397,6 +419,15 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
           <form action={handleUpdate} className="space-y-5">
             <Field label="Nom">
               <input required name="name" defaultValue={editing.name} className={fieldInputClass} />
+            </Field>
+            <Field label="Type">
+              <select name="type" defaultValue={editing.type} className={fieldInputClass}>
+                {partnerTypes.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
             </Field>
             <Field label="Site web">
               <input name="url" type="url" defaultValue={editing.url ?? ""} className={fieldInputClass} />

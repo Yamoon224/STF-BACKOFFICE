@@ -276,6 +276,7 @@ export async function createPartnerAction(formData: FormData): Promise<void> {
   const payload = new FormData();
   payload.set("name", String(formData.get("name") ?? ""));
   payload.set("url", String(formData.get("url") ?? ""));
+  payload.set("type", String(formData.get("type") ?? "confiance"));
 
   const logo = formData.get("logo");
   if (logo instanceof File && logo.size > 0) {
@@ -291,6 +292,7 @@ export async function updatePartnerAction(partnerId: number, formData: FormData)
   payload.set("_method", "PATCH");
   payload.set("name", String(formData.get("name") ?? ""));
   payload.set("url", String(formData.get("url") ?? ""));
+  payload.set("type", String(formData.get("type") ?? "confiance"));
 
   const logo = formData.get("logo");
   if (logo instanceof File && logo.size > 0) {

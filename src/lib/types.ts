@@ -121,6 +121,7 @@ export type Partner = {
   logo_url: string | null;
   url: string | null;
   order: number;
+  type: "confiance" | "partenaire";
 };
 
 export type Testimonial = {
