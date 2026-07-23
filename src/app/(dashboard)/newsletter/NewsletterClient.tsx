@@ -44,7 +44,7 @@ export function NewsletterClient({
             {subscribers.map((subscriber) => (
               <tr key={subscriber.id}>
                 <td className="py-4 font-medium text-stf-navy dark:text-white">{subscriber.email}</td>
-                <td className="py-4 text-slate-500 dark:text-slate-400">{subscriber.name ?? "—"}</td>
+                <td className="py-4 text-slate-500 dark:text-slate-400">{subscriber.name ?? "-"}</td>
                 <td className="py-4">
                   <Badge tone={subscriber.status === "actif" ? "green" : "neutral"}>
                     {subscriber.status === "actif" ? "Actif" : "Désabonnée"}

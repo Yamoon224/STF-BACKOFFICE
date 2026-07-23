@@ -140,8 +140,8 @@ export function UtilisatricesClient({
               {users.map((u) => (
                 <tr key={u.id}>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{u.name}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{roleLabel(u.roles[0]?.name ?? "—")}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{u.country ?? "—"}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{roleLabel(u.roles[0]?.name ?? "-")}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{u.country ?? "-"}</td>
                   <td className="py-4">
                     <Badge tone={statusTone[u.status] ?? "neutral"}>{statusLabel(u.status)}</Badge>
                   </td>

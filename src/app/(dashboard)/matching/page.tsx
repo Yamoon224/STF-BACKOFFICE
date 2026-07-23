@@ -37,12 +37,12 @@ export default async function MatchingPage() {
                   <tr key={m.pairing_id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{m.mentee.name}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{m.program.name}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{m.suggested_mentor?.name ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{m.suggested_mentor?.name ?? "-"}</td>
                     <td className="py-4">
                       {m.score !== null ? (
                         <Badge tone={m.score >= 90 ? "green" : m.score >= 85 ? "blue" : "orange"}>{m.score}%</Badge>
                       ) : (
-                        "—"
+                        "-"
                       )}
                     </td>
                     <td className="py-4">

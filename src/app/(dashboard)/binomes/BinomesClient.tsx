@@ -121,7 +121,7 @@ export function BinomesClient({
               {pairingsPage.pageItems.map((p) => (
                 <tr key={p.id}>
                   <td className="py-4 font-medium text-stf-navy dark:text-white">{p.mentee.name}</td>
-                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.mentor?.name ?? "—"}</td>
+                  <td className="py-4 text-slate-500 dark:text-slate-400">{p.mentor?.name ?? "-"}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{p.program.name}</td>
                   <td className="py-4 text-slate-500 dark:text-slate-400">{p.sessions_realisees_count ?? 0}</td>
                   <td className="py-4">
@@ -191,10 +191,10 @@ export function BinomesClient({
                 sessionsPage.pageItems.map((s) => (
                   <tr key={s.id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">
-                      {s.pairing.mentee.name} ⇄ {s.pairing.mentor?.name ?? "—"}
+                      {s.pairing.mentee.name} ⇄ {s.pairing.mentor?.name ?? "-"}
                     </td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{formatDateTime(s.scheduled_at)}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{s.topic ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{s.topic ?? "-"}</td>
                     <td className="py-4">
                       <Badge
                         tone={
@@ -296,7 +296,7 @@ export function BinomesClient({
                 <option value="">Aucune</option>
                 {cohorts.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.program?.name ? `${c.program.name} — ${c.name}` : c.name}
+                    {c.program?.name ? `${c.program.name} - ${c.name}` : c.name}
                   </option>
                 ))}
               </select>

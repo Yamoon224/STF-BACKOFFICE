@@ -16,10 +16,10 @@ export default async function ProfilPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-stf-orange-light text-lg font-bold text-stf-orange">
-              {user ? initials(user.name) : "—"}
+              {user ? initials(user.name) : "-"}
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold text-stf-navy dark:text-white">{user?.name ?? "—"}</h2>
+              <h2 className="truncate text-lg font-semibold text-stf-navy dark:text-white">{user?.name ?? "-"}</h2>
               <p className="truncate text-sm text-slate-500 dark:text-slate-400">{user?.email ?? ""}</p>
             </div>
           </div>
@@ -37,7 +37,7 @@ export default async function ProfilPage() {
             <li className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
               Rôle
               <span className="text-right font-medium text-stf-navy dark:text-white">
-                {roleLabel(user?.roles[0] ?? "—")}
+                {roleLabel(user?.roles[0] ?? "-")}
               </span>
             </li>
             <li className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 dark:border-border-subtle">

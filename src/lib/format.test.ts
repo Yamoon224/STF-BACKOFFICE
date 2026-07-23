@@ -7,13 +7,13 @@ describe("formatDate", () => {
   });
 
   it("returns an em dash for null", () => {
-    expect(formatDate(null)).toBe("—");
+    expect(formatDate(null)).toBe("-");
   });
 });
 
 describe("formatDateTime", () => {
   it("returns an em dash for null", () => {
-    expect(formatDateTime(null)).toBe("—");
+    expect(formatDateTime(null)).toBe("-");
   });
 
   it("includes both date and time", () => {

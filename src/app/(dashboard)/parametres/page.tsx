@@ -60,7 +60,7 @@ export default async function ParametresPage() {
           <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
             <li className="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
               Dernière sauvegarde
-              <span className="font-medium text-stf-navy dark:text-white">14/07/2026 — 02:00</span>
+              <span className="font-medium text-stf-navy dark:text-white">14/07/2026 - 02:00</span>
             </li>
             <li className="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-border-subtle">
               Fréquence

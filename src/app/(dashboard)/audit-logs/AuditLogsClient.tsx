@@ -36,7 +36,7 @@ export function AuditLogsClient({
                 <td className="py-4 font-medium text-stf-navy dark:text-white">{log.actor?.name ?? "Système"}</td>
                 <td className="py-4 text-slate-500 dark:text-slate-400">{log.action}</td>
                 <td className="py-4 text-slate-500 dark:text-slate-400">
-                  {log.target_type ? `${log.target_type} #${log.target_id}` : "—"}
+                  {log.target_type ? `${log.target_type} #${log.target_id}` : "-"}
                 </td>
               </tr>
             ))}

@@ -120,8 +120,8 @@ export default async function DashboardPage() {
               {pendingMentorsRes.data.map((m) => (
                 <tr key={m.id}>
                   <td className="py-3 font-medium text-stf-navy dark:text-white">{m.name}</td>
-                  <td className="py-3 text-slate-500 dark:text-slate-400">{m.mentor_profile?.expertise ?? "—"}</td>
-                  <td className="py-3 text-slate-500 dark:text-slate-400">{m.country ?? "—"}</td>
+                  <td className="py-3 text-slate-500 dark:text-slate-400">{m.mentor_profile?.expertise ?? "-"}</td>
+                  <td className="py-3 text-slate-500 dark:text-slate-400">{m.country ?? "-"}</td>
                   <td className="py-3">
                     <div className="flex gap-2">
                       <form action={validateMentorAction.bind(null, m.id)}>

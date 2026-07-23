@@ -192,7 +192,7 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
                       />
                     ) : (
                       <span className="flex h-10 w-14 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
-                        —
+                        -
                       </span>
                     )}
                   </td>
@@ -365,7 +365,7 @@ function GalleryEditor({ page }: { page: CmsPage }) {
   return (
     <div className="mt-6 border-t border-slate-100 pt-5 dark:border-border-subtle">
       <p className="text-sm font-semibold text-stf-navy dark:text-white">
-        Galerie photos <span className="font-normal text-slate-400">— activité / événement</span>
+        Galerie photos <span className="font-normal text-slate-400">- activité / événement</span>
       </p>
       {images.length > 0 ? (
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
@@ -483,7 +483,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
                         />
                       ) : (
                         <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
-                          —
+                          -
                         </span>
                       )}
                     </td>
@@ -491,7 +491,7 @@ function PartnersPanel({ partners }: { partners: Partner[] }) {
                     <td className="py-4">
                       <Badge tone={p.type === "confiance" ? "orange" : "neutral"}>{partnerTypeLabel(p.type)}</Badge>
                     </td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{p.url ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{p.url ?? "-"}</td>
                     <td className="py-4">
                       <div className="flex gap-3">
                         <button
@@ -691,12 +691,12 @@ function ScholarshipsPanel({ scholarships }: { scholarships: Scholarship[] }) {
                         />
                       ) : (
                         <span className="flex h-10 w-14 items-center justify-center rounded-lg border border-dashed border-slate-200 text-xs text-slate-300 dark:border-border-default dark:text-slate-600">
-                          —
+                          -
                         </span>
                       )}
                     </td>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{s.title}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{s.provider ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{s.provider ?? "-"}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{formatDate(s.deadline)}</td>
                     <td className="py-4">
                       <Badge tone={scholarshipStatusTone(s.status)}>{scholarshipStatusLabel(s.status)}</Badge>
@@ -928,7 +928,7 @@ function TestimonialsPanel({ testimonials }: { testimonials: Testimonial[] }) {
               <div key={t.id} className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 p-4 dark:border-border-subtle">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-stf-navy dark:text-white">
-                    {t.name} <span className="font-normal text-slate-400">— {t.role}</span>
+                    {t.name} <span className="font-normal text-slate-400">- {t.role}</span>
                   </p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">&laquo; {t.quote} &raquo;</p>
                 </div>
@@ -1265,7 +1265,7 @@ function sectionSummary(section: PageSection): string {
   const p = section.payload as Record<string, unknown>;
   if (typeof p.title === "string") return p.title;
   if (Array.isArray(p.items)) return `${p.items.length} élément(s)`;
-  return "—";
+  return "-";
 }
 
 function PageSectionsPanel({ pageSections }: { pageSections: PageSection[] }) {
@@ -1310,7 +1310,7 @@ function PageSectionsPanel({ pageSections }: { pageSections: PageSection[] }) {
       <Modal
         open={editing !== null}
         onClose={() => setEditing(null)}
-        title={editing ? `${pageLabels[editing.page_key] ?? editing.page_key} — ${sectionLabels[editing.section_key] ?? editing.section_key}` : ""}
+        title={editing ? `${pageLabels[editing.page_key] ?? editing.page_key} - ${sectionLabels[editing.section_key] ?? editing.section_key}` : ""}
         className="max-w-2xl"
       >
         {editing ? <SectionEditorForm section={editing} onDone={() => setEditing(null)} /> : null}

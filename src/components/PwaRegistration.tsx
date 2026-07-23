@@ -7,7 +7,7 @@ export function PwaRegistration() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
     navigator.serviceWorker.register("/sw.js").catch(() => {
-      // Offline support is a progressive enhancement — ignore registration failures.
+      // Offline support is a progressive enhancement - ignore registration failures.
     });
   }, []);
 

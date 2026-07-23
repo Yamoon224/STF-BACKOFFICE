@@ -59,11 +59,11 @@ export async function apiFetch<T = unknown>(path: string, options: ApiFetchOptio
       try {
         // Cookie mutation only succeeds when called from a Server Action / Route
         // Handler; in a Server Component render (read-only cookies) this throws,
-        // which we ignore — the redirect below still fires either way.
+        // which we ignore - the redirect below still fires either way.
         const cookieStore = await cookies();
         cookieStore.delete(AUTH_COOKIE);
       } catch {
-        // ignore — read-only cookies() context (Server Component render)
+        // ignore - read-only cookies() context (Server Component render)
       }
       redirect("/connexion");
     }

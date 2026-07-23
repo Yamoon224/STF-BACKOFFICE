@@ -16,9 +16,9 @@ export default async function DashboardLayout({
 
   return (
     <AdminShell
-      userName={user?.name ?? "—"}
+      userName={user?.name ?? "-"}
       userEmail={user?.email ?? ""}
-      userInitials={user ? initials(user.name) : "—"}
+      userInitials={user ? initials(user.name) : "-"}
       userAccess={ROLE_ACCESS_LABELS[role] ?? "Accès STF"}
     >
       {children}

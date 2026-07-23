@@ -174,8 +174,8 @@ function CoursesPanel({
                 pageItems.map((c) => (
                   <tr key={c.id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{c.title}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{levelMap[c.level_id] ?? "—"}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{subjectMap[c.subject_id] ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{levelMap[c.level_id] ?? "-"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{subjectMap[c.subject_id] ?? "-"}</td>
                     <td className="py-4">
                       <Badge tone={c.status === "publie" ? "green" : "neutral"}>{statusLabel(c.status)}</Badge>
                     </td>
@@ -392,12 +392,12 @@ function ExperimentsPanel({
                 pageItems.map((e) => (
                   <tr key={e.id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{e.title}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{subjectMap[e.subject_id] ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{subjectMap[e.subject_id] ?? "-"}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">
-                      {e.level_id ? levelMap[e.level_id] ?? "—" : "—"}
+                      {e.level_id ? levelMap[e.level_id] ?? "-" : "-"}
                     </td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">
-                      {e.course_id ? courseMap[e.course_id] ?? "—" : "Aucun"}
+                      {e.course_id ? courseMap[e.course_id] ?? "-" : "Aucun"}
                     </td>
                     <td className="py-4">
                       <Badge tone={e.status === "publie" ? "green" : "neutral"}>{statusLabel(e.status)}</Badge>
@@ -629,7 +629,7 @@ function SessionsPanel({
                 pageItems.map((s) => (
                   <tr key={s.id}>
                     <td className="py-4 font-medium text-stf-navy dark:text-white">{s.title}</td>
-                    <td className="py-4 text-slate-500 dark:text-slate-400">{courseMap[s.course_id] ?? "—"}</td>
+                    <td className="py-4 text-slate-500 dark:text-slate-400">{courseMap[s.course_id] ?? "-"}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{formatDateTime(s.scheduled_at)}</td>
                     <td className="py-4 text-slate-500 dark:text-slate-400">{s.duration_minutes} min</td>
                     <td className="py-4">

@@ -127,7 +127,7 @@ export function GroupesClient({ groups }: { groups: Group[] }) {
       >
         <form action={handleCreate} className="space-y-5">
           <Field label="Nom du groupe">
-            <input required name="name" placeholder="Ex. Atelier Robotique — Projet pilote" className={fieldInputClass} />
+            <input required name="name" placeholder="Ex. Atelier Robotique - Projet pilote" className={fieldInputClass} />
           </Field>
           <Field label="Type">
             <select name="type" defaultValue={groupTypes[1].value} className={fieldInputClass}>
