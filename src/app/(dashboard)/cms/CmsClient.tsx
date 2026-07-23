@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
 import { Pagination, usePagination } from "@/components/ui/Pagination";
 import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
+import { ApiError } from "@/lib/api";
 import {
   addCmsPageImagesAction,
   createCmsPageAction,
@@ -332,20 +333,33 @@ function PagesPanel({ cmsPages }: { cmsPages: CmsPage[] }) {
 
 function GalleryEditor({ page }: { page: CmsPage }) {
   const [images, setImages] = useState(page.images ?? []);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
 
   function handleAdd(formData: FormData) {
+    setError(null);
     startTransition(async () => {
-      const created = await addCmsPageImagesAction(page.id, formData);
-      setImages((prev) => [...prev, ...created]);
+      try {
+        const created = await addCmsPageImagesAction(page.id, formData);
+        setImages((prev) => [...prev, ...created]);
+        formRef.current?.reset();
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : "L'ajout des images a échoué.");
+      }
     });
   }
 
   function handleRemove(imageId: number) {
     if (!confirm("Retirer cette image de la galerie ?")) return;
+    setError(null);
     startTransition(async () => {
-      await deleteCmsPageImageAction(imageId);
-      setImages((prev) => prev.filter((img) => img.id !== imageId));
+      try {
+        await deleteCmsPageImageAction(imageId);
+        setImages((prev) => prev.filter((img) => img.id !== imageId));
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : "La suppression a échoué.");
+      }
     });
   }
 
@@ -380,7 +394,7 @@ function GalleryEditor({ page }: { page: CmsPage }) {
       ) : (
         <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">Aucune image dans la galerie pour le moment.</p>
       )}
-      <form action={handleAdd} className="mt-3 flex flex-wrap items-center gap-3">
+      <form ref={formRef} action={handleAdd} className="mt-3 flex flex-wrap items-center gap-3">
         <input name="images" type="file" accept="image/*" multiple className={fieldInputClass + " max-w-xs"} />
         <button
           type="submit"
@@ -390,6 +404,10 @@ function GalleryEditor({ page }: { page: CmsPage }) {
           + Ajouter à la galerie
         </button>
       </form>
+      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+      <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
+        Formats image, 8 Mo maximum par photo, 10 photos par envoi.
+      </p>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   Flag,
   Handshake,
   LayoutDashboard,
+  Mail,
   Menu,
   Settings,
   Shield,
@@ -48,6 +49,7 @@ const navGroups: { titleKey: string; items: { href: string; labelKey: string; ic
     items: [
       { href: "/cms", labelKey: "cms", icon: FileText },
       { href: "/experiences-virtuelles", labelKey: "experiencesVirtuelles", icon: FlaskConical },
+      { href: "/newsletter", labelKey: "newsletter", icon: Mail },
       { href: "/reporting", labelKey: "reporting", icon: TrendingUp },
     ],
   },

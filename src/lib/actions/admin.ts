@@ -660,3 +660,8 @@ export async function deleteLiveSessionAction(sessionId: number): Promise<void> 
   await apiFetch(`/live-sessions/${sessionId}`, { method: "DELETE" });
   revalidatePath("/experiences-virtuelles");
 }
+
+export async function deleteNewsletterSubscriberAction(subscriberId: number): Promise<void> {
+  await apiFetch(`/newsletter/subscribers/${subscriberId}`, { method: "DELETE" });
+  revalidatePath("/newsletter");
+}

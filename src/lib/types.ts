@@ -178,6 +178,15 @@ export type Report = {
   reporter: UserRef;
 };
 
+export type NewsletterSubscriber = {
+  id: number;
+  email: string;
+  name: string | null;
+  status: "actif" | "desabonne";
+  subscribed_at: string | null;
+  unsubscribed_at: string | null;
+};
+
 export type AuditLog = {
   id: number;
   actor_id: number | null;
