@@ -7,7 +7,6 @@ import { Modal } from "@/components/ui/Modal";
 import { Field, fieldInputClass } from "@/components/ui/FormField";
 import { Pagination, usePagination } from "@/components/ui/Pagination";
 import { PencilIcon, PlusIcon, TrashIcon } from "@/components/ui/Icons";
-import { ApiError } from "@/lib/api";
 import {
   addCmsPageImagesAction,
   createCmsPageAction,
@@ -345,7 +344,7 @@ function GalleryEditor({ page }: { page: CmsPage }) {
         setImages((prev) => [...prev, ...created]);
         formRef.current?.reset();
       } catch (err) {
-        setError(err instanceof ApiError ? err.message : "L'ajout des images a échoué.");
+        setError(err instanceof Error ? err.message : "L'ajout des images a échoué.");
       }
     });
   }
@@ -358,7 +357,7 @@ function GalleryEditor({ page }: { page: CmsPage }) {
         await deleteCmsPageImageAction(imageId);
         setImages((prev) => prev.filter((img) => img.id !== imageId));
       } catch (err) {
-        setError(err instanceof ApiError ? err.message : "La suppression a échoué.");
+        setError(err instanceof Error ? err.message : "La suppression a échoué.");
       }
     });
   }
