@@ -131,15 +131,17 @@ export function AdminShell({
 
   return (
     <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white py-6 dark:border-border-default dark:bg-surface lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-slate-200 bg-white py-6 dark:border-border-default dark:bg-surface lg:flex">
         <Link href="/" className="flex items-center gap-2 px-6 pb-6">
           <span className="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-black/5">
             <Image src="/brand/logo.jpg" alt="STF" fill sizes="36px" className="object-cover" />
           </span>
           <span className="text-sm font-semibold text-stf-navy dark:text-white">{t("nav.backoffice")}</span>
         </Link>
-        <NavList pathname={pathname} t={t} />
-        <div className="mx-3 mt-6">
+        <div className="flex-1 overflow-y-auto">
+          <NavList pathname={pathname} t={t} />
+        </div>
+        <div className="mx-3 mt-6 shrink-0">
           <UserMenu
             panelClassName="bottom-full left-0 mb-2"
             userName={userName}
